@@ -30,4 +30,4 @@ class AdminCog(commands.Cog):
 async def setup(bot: commands.Bot):
     """Load the AdminCog."""
     await bot.add_cog(AdminCog(bot))
-    logger.info("AdminCog loaded successfully.")
+    logger.debug("AdminCog loaded successfully.")

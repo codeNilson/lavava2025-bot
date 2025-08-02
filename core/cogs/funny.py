@@ -42,4 +42,4 @@ class FunnyCog(commands.Cog):
 async def setup(bot: commands.Bot):
     """Load the FunnyCog."""
     await bot.add_cog(FunnyCog(bot))
-    logger.info("FunnyCog loaded successfully.")
+    logger.debug("FunnyCog loaded successfully.")

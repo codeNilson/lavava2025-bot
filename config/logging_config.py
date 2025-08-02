@@ -1,13 +1,11 @@
-import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from logging import Formatter
-from dotenv import load_dotenv
+from utils import get_variable
 
 
 def get_log_level() -> str:
-    load_dotenv()
-    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+    log_level = get_variable("LOG_LEVEL", fallback="LOG_INFO").upper()
     if log_level not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
         raise ValueError(f"Invalid LOG_LEVEL: {log_level}")
     return log_level

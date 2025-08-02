@@ -1,17 +1,13 @@
-import os
 from discord import Intents
 from discord.ext.commands import Bot
-from dotenv import load_dotenv
 
 from core.bot import LavavaBot
-from settings.logging_config import setup_root_logger
+from config.logging_config import setup_root_logger
+from utils import get_variable
 
 
 def get_token() -> str:
-    load_dotenv()
-    token = os.getenv("DISCORD_TOKEN")
-    if not token:
-        raise RuntimeError("DISCORD_TOKEN não encontrado no .env")
+    token = get_variable("DISCORD_TOKEN")
     return token
 
 
