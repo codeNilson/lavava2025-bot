@@ -1,12 +1,10 @@
 import os
-import logging
-from logging.handlers import TimedRotatingFileHandler
-from logging import Formatter
 from discord import Intents
 from discord.ext.commands import Bot
 from dotenv import load_dotenv
 
-logger = logging.getLogger("discord.client")
+from core.bot import LavavaBot
+from settings.logging_config import setup_root_logger
 
 
 def get_token() -> str:
@@ -23,32 +21,12 @@ def get_bot() -> Bot:
     return Bot(command_prefix="!", intents=intents)
 
 
-def setup_logger():
-
-    handler = TimedRotatingFileHandler(
-        "logs/lavava_logger.log",
-        when="midnight",
-        interval=1,
-        backupCount=7,
-        encoding="UTF-8",
-    )
-
-    formatter = Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    logger.addHandler(handler)
-    handler.setFormatter(formatter)
-
-
 def main() -> None:
-    setup_logger()
+    setup_root_logger()
     token = get_token()
-    bot = get_bot()
-    logger.info("Iniciando o bot...")
+    intents = Intents.default()
+    intents.message_content = True
+    bot = LavavaBot(intents=intents)
     bot.run(token)
 
 
