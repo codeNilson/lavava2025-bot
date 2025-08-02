@@ -1,3 +1,11 @@
-PyNaCl is not installed, voice will NOT be supported
-logging in using static token
-Shard ID None has connected to Gateway (Session ID: f3cffc45fbb65b4790f6055520c8ce1b).
+2025-08-01 21:20:35 - discord.client - WARNING - PyNaCl is not installed, voice will NOT be supported
+2025-08-01 21:20:35 - discord.client - INFO - logging in using static token
+2025-08-01 21:20:36 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 8f77a0e4e305476115873d71ce85bf05).
+2025-08-01 21:21:59 - discord.client - WARNING - PyNaCl is not installed, voice will NOT be supported
+2025-08-01 21:21:59 - discord - INFO - Iniciando o bot...
+2025-08-01 21:21:59 - discord.client - INFO - logging in using static token
+2025-08-01 21:22:00 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 0fbedc6a8c012df7894cf411ac7ef189).
+2025-08-01 21:23:11 - discord.client - WARNING - PyNaCl is not installed, voice will NOT be supported
+2025-08-01 21:23:11 - discord.client - INFO - Iniciando o bot...
+2025-08-01 21:23:11 - discord.client - INFO - logging in using static token
+2025-08-01 21:23:13 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 60f59548d5edd3c304ae63334096aa5c).
