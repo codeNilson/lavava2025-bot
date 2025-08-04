@@ -12,7 +12,6 @@ class FunnyCog(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.reactions = {
-            "ping": "pong",
             "natan": "🐂",
             "nathan": "🐂",
             "eric": "💩",

@@ -1,9 +1,9 @@
 from discord import Intents
 from discord.ext.commands import Bot
 
-from core.bot import LavavaBot
-from config.logging_config import setup_root_logger
-from utils import get_variable
+from src.core.bot import LavavaBot
+from src.config.logging_config import setup_root_logger
+from src.utils import get_variable
 
 
 def get_token() -> str:
@@ -14,15 +14,14 @@ def get_token() -> str:
 def get_bot() -> Bot:
     intents = Intents.default()
     intents.message_content = True
-    return Bot(command_prefix="!", intents=intents)
+    intents.members = True
+    return LavavaBot(intents=intents)
 
 
 def main() -> None:
     setup_root_logger()
     token = get_token()
-    intents = Intents.default()
-    intents.message_content = True
-    bot = LavavaBot(intents=intents)
+    bot = get_bot()
     bot.run(token)
 
 

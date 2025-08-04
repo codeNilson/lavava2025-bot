@@ -10,14 +10,12 @@ class AdminCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.command(name="ping")
-    async def ping(self, ctx: commands.Context):
-        await ctx.send("Pong!")
-
-    @app_commands.command(name="teste", description="Comando de teste básico")
-    async def teste(self, interaction: discord.Interaction):
-        """Comando slash básico para teste."""
-        await interaction.response.send_message("🎉 Slash command funcionando!")
+    @app_commands.command(
+        name="ping", description="Comando de teste para administração"
+    )
+    @app_commands.default_permissions(administrator=True)
+    async def ping(self, interaction: discord.Interaction):
+        await interaction.response.send_message("Pong!")
 
     @commands.command(name="shutdown")
     @commands.has_permissions(administrator=True)

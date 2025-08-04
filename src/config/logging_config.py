@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from logging import Formatter
-from utils import get_variable
+from ..utils import get_variable
 
 
 def get_log_level() -> str:
@@ -23,7 +23,7 @@ def setup_root_logger():
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    handler = TimedRotatingFileHandler(
+    file_handler = TimedRotatingFileHandler(
         "logs/lavava_logger.log",
         when="midnight",
         interval=1,
@@ -31,6 +31,11 @@ def setup_root_logger():
         encoding="UTF-8",
     )
 
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    console_handler = logging.StreamHandler()
+
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
     logger.setLevel(log_level)
