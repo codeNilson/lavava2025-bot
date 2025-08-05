@@ -54,6 +54,7 @@ class LavavaBot(commands.Bot):
         await self.load_extension("src.core.cogs.admin")
         await self.load_extension("src.core.cogs.funny")
         await self.load_extension("src.core.cogs.registration")
+        await self.load_extension("src.core.cogs.match")
         self.tree.copy_global_to(guild=GUILD_ID)
         await self.tree.sync(guild=GUILD_ID)
         # await self.tree.sync()
