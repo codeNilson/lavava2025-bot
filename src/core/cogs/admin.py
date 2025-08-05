@@ -11,18 +11,12 @@ class AdminCog(commands.Cog):
         self.bot = bot
 
     @app_commands.command(
-        name="ping", description="Comando de teste para administração"
+        name="ping",
+        description="Comando de teste para administração",
     )
     @app_commands.default_permissions(administrator=True)
     async def ping(self, interaction: discord.Interaction):
         await interaction.response.send_message("Pong!")
-
-    @commands.command(name="shutdown")
-    @commands.has_permissions(administrator=True)
-    async def shutdown(self, ctx: commands.Context):
-        """Comando para desligar o bot."""
-        await ctx.send("Lavava Bot será desligado.")
-        await self.bot.close()
 
 
 async def setup(bot: commands.Bot):
