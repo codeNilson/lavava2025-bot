@@ -13,7 +13,7 @@ logger = logging.getLogger("lavava.cog.match")
 
 
 class MatchCog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.available_players: Optional[list[Player]] = None
         self.confirmed_players: list[Player] = []
@@ -25,11 +25,11 @@ class MatchCog(commands.Cog):
     async def confirm_players(
         self,
         interaction: discord.Interaction,
-    ):
+    ) -> None:
 
         self.confirmed_players.clear()
 
-        players_loaded = await self._load_all_players(interaction)
+        players_loaded: bool = await self._load_all_players(interaction)
         if not players_loaded:
             return
 
@@ -41,7 +41,7 @@ class MatchCog(commands.Cog):
     async def _load_all_players(
         self,
         interaction: discord.Interaction,
-    ):
+    ) -> bool:
         """Load all players from the database."""
 
         players_data = await get_all_players()
