@@ -15,7 +15,8 @@ logger = logging.getLogger("lavava.cog.match")
 class MatchCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.players: Optional[list[Player]] = None
+        self.available_players: Optional[list[Player]] = None
+        self.confirmed_players: list[Player] = []
 
     @app_commands.command(
         name="confirmar_participantes",
@@ -26,13 +27,15 @@ class MatchCog(commands.Cog):
         interaction: discord.Interaction,
     ):
 
+        self.confirmed_players.clear()
+
         players_loaded = await self._load_all_players(interaction)
         if not players_loaded:
             return
 
         await interaction.response.send_message(
-            embed=list_players_embed(self.players),  # type: ignore
-            view=ConfirmParticipationView(self.players),  # type: ignore
+            embed=list_players_embed(self.available_players),  # type: ignore
+            view=ConfirmParticipationView(self.available_players, cog=self),  # type: ignore
         )
 
     async def _load_all_players(
@@ -49,7 +52,7 @@ class MatchCog(commands.Cog):
                 delete_after=10,
             )
             return False
-        self.players = [Player(**player) for player in players_data]
+        self.available_players = [Player(**player) for player in players_data]
         return True
 
 
