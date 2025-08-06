@@ -30,7 +30,7 @@ class MatchCog(commands.Cog):
         self.confirmed_players.clear()
 
         players_loaded: bool = await self._load_all_players(interaction)
-        if not players_loaded:
+        if not players_loaded or not self.available_players:
             return
 
         confirmation_view = ConfirmParticipationView(self.available_players, cog=self)

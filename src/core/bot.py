@@ -24,7 +24,10 @@ class LavavaBot(commands.Bot):
             await interaction.response.send_message(
                 "Esse comando não existe. Cê é burrão hein?", ephemeral=True
             )
-            logger.debug("User tried to use a non-existent command: %s", interaction.command.name)  # type: ignore
+            logger.debug(
+                "User tried to use a non-existent command: %s",
+                interaction.command.name,  # type: ignore
+            )
         elif isinstance(error, commands.MissingPermissions):
             await interaction.response.send_message(
                 "Você não tem permissão para usar este comando.", ephemeral=True

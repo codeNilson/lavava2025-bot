@@ -24,7 +24,7 @@ async def register_new_player(player: discord.Member):
             method="POST",
             data={
                 "username": player.name,
-                "discordId": str(player.id),
+                "discordId": player.id,
             },
         )
     except ResourceAlreadyExistsError:

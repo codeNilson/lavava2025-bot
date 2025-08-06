@@ -1,7 +1,13 @@
 class Player:
-    def __init__(self, username: str, discordId: str, *args, **kwargs):
+    def __init__(
+        self,
+        username: str,
+        discordId: int,
+        *args,
+        **kwargs,
+    ) -> None:
         self.username = username
-        self.discord_id = int(discordId)
+        self.discord_id = discordId
 
     def __str__(self):
         return f"{self.username}"
