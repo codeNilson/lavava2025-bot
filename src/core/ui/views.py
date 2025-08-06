@@ -117,6 +117,7 @@ class ConfirmParticipationView(discord.ui.View):
         user_player: Optional[Player] = self._find_player_in_available(
             interaction.user.id
         )
+        print(user_player)
 
         if not user_player:
             await interaction.response.send_message(

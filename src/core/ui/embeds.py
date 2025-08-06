@@ -10,8 +10,13 @@ def list_players_embed(
     denied_players: Optional[list[Player]] = None,
 ) -> discord.Embed:
     """Create an embed listing all players with their confirmation status."""
-    embed = discord.Embed(title="Confirmar participação", color=discord.Color.blue())
-    embed.description = "🎮 **Confirmação de Participação**\n\nVerifique se seu nome está na lista. Os jogadores listados podem participar da próxima partida.\n\n✅ **Confirme sua participação** se deseja jogar!"
+    embed = discord.Embed(title="🏆 Partida Lavava 2025", color=discord.Color.blue())
+    embed.description = (
+        "⚔️ **Uma nova partida está sendo formada!**\n\n"
+        "Todos os jogadores listados abaixo estão **qualificados** para participar. "
+        "Use os botões para **confirmar** se você irá jogar ou **recusar** se não puder participar desta vez.\n\n"
+        "⏰ **Tempo limite:** 2 minutos para confirmação"
+    )
 
     # Listas para controle de status
     confirmed_players = confirmed_players or []
@@ -42,7 +47,7 @@ def list_players_embed(
     pending_count = total - confirmed_count - denied_count
 
     embed.set_footer(
-        text=f"✅ {confirmed_count} | ❌ {denied_count} | ⏳ {pending_count} | Total: {total}"
+        text=f"🎮 {confirmed_count} confirmados • 🚫 {denied_count} recusados • ⏳ {pending_count} aguardando • 👥 {total} total"
     )
 
     return embed
