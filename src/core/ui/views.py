@@ -16,7 +16,7 @@ class ConfirmParticipationView(discord.ui.View):
     """View to confirm participation in a match."""
 
     def __init__(self, players: list[Player], cog: "MatchCog") -> None:
-        super().__init__(timeout=30)
+        super().__init__(timeout=60)
         self.players: list[Player] = players
         self.cog: "MatchCog" = cog
         self.available_players: list[Player] = self.cog.available_players or []
