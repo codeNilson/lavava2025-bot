@@ -1,4 +1,3 @@
-from typing import Optional
 import logging
 import discord
 from discord import app_commands
@@ -13,10 +12,11 @@ logger = logging.getLogger("lavava.cog.match")
 
 
 class MatchCog(commands.Cog):
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.available_players: Optional[list[Player]] = None
+        self.available_players: list[Player] = []
         self.confirmed_players: list[Player] = []
+        self.denied_players: list[Player] = []
 
     @app_commands.command(
         name="confirmar_participantes",

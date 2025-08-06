@@ -3,6 +3,7 @@ from typing import Optional, TYPE_CHECKING
 import discord
 from discord.utils import find
 from src.models.player_model import Player
+from .embeds import list_players_embed
 
 if TYPE_CHECKING:
     from src.core.cogs.match import MatchCog
@@ -29,70 +30,84 @@ class ConfirmParticipationView(discord.ui.View):
         """Check if a user has already confirmed participation."""
         return any(p.discord_id == user_id for p in self.cog.confirmed_players)
 
-    @discord.ui.button(label="Bora jogar!", style=discord.ButtonStyle.green, emoji="🔥")
+    @discord.ui.button(
+        label="Bora jogar!",
+        style=discord.ButtonStyle.green,
+        emoji="🔥",
+    )
     async def confirm_button(
         self, interaction: discord.Interaction, _: discord.ui.Button
     ) -> None:
         """Handle the confirmation button click."""
 
-        user_player: Optional[Player] = self._find_player_in_available(
-            interaction.user.id
+        user_id = interaction.user.id
+
+        # Encontra o jogador na lista disponível
+        user_player = self._find_player_in_available(user_id)
+        if not user_player:
+            await interaction.response.send_message(
+                "❌ Você não está na lista de jogadores disponíveis.",
+                ephemeral=True,
+            )
+            return
+
+        # Remove das listas se já estava em alguma
+        self.cog.confirmed_players = [
+            p for p in self.cog.confirmed_players if p.discord_id != user_id
+        ]
+        self.cog.denied_players = [
+            p for p in self.cog.denied_players if p.discord_id != user_id
+        ]
+
+        # Adiciona à lista de confirmados
+        self.cog.confirmed_players.append(user_player)
+
+        # Atualiza o embed
+        from .embeds import list_players_embed
+
+        updated_embed = list_players_embed(
+            self.available_players, self.cog.confirmed_players, self.cog.denied_players
         )
 
-        if user_player and user_player not in self.cog.confirmed_players:
-            self.cog.confirmed_players.append(user_player)
-            await interaction.response.send_message(
-                "Participação confirmada!",
-                ephemeral=True,
-                delete_after=30,
-            )
-            logger.debug(
-                "User %s (ID: %s) confirmed participation.",
-                interaction.user.name,
-                interaction.user.id,
-            )
-        elif user_player and user_player in self.cog.confirmed_players:
-            await interaction.response.send_message(
-                "Você já confirmou sua participação.",
-                ephemeral=True,
-                delete_after=5,
-            )
-        else:
-            await interaction.response.send_message(
-                "Você não está na lista de jogadores disponíveis.",
-                ephemeral=True,
-                delete_after=5,
-            )
+        await interaction.response.edit_message(embed=updated_embed, view=self)
 
-    @discord.ui.button(label="Dessa vez não", style=discord.ButtonStyle.red, emoji="😴")
-    async def cancel_button(
+    @discord.ui.button(
+        label="Dessa vez não",
+        style=discord.ButtonStyle.secondary,
+        emoji="❌",
+    )
+    async def deny_button(
         self, interaction: discord.Interaction, _: discord.ui.Button
     ) -> None:
-        """Handle the confirmation button click."""
+        """Handle the deny button click."""
 
-        if self._user_has_confirmed(interaction.user.id):
-            self.cog.confirmed_players = [
-                p
-                for p in self.cog.confirmed_players
-                if p.discord_id != interaction.user.id
-            ]
-            await interaction.response.send_message(
-                "Participação cancelada.",
-                ephemeral=True,
-                delete_after=30,
-            )
-            logger.debug(
-                "User %s (ID: %s) canceled participation.",
-                interaction.user.name,
-                interaction.user.id,
-            )
+        user_id = interaction.user.id
 
-        else:
+        # Encontra o jogador na lista disponível
+        user_player = self._find_player_in_available(user_id)
+        if not user_player:
             await interaction.response.send_message(
-                "Você não confirmou sua participação.",
+                "❌ Você não está na lista de jogadores disponíveis.",
                 ephemeral=True,
-                delete_after=5,
             )
+            return
+
+        # Remove das listas se já estava em alguma
+        self.cog.confirmed_players = [
+            p for p in self.cog.confirmed_players if p.discord_id != user_id
+        ]
+        self.cog.denied_players = [
+            p for p in self.cog.denied_players if p.discord_id != user_id
+        ]
+
+        # Adiciona à lista de negados
+        self.cog.denied_players.append(user_player)
+
+        updated_embed = list_players_embed(
+            self.available_players, self.cog.confirmed_players, self.cog.denied_players
+        )
+
+        await interaction.response.edit_message(embed=updated_embed, view=self)
 
     async def on_timeout(self) -> None:
         for child in self.children:
