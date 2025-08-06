@@ -55,5 +55,27 @@ class ConfirmParticipationView(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
         """Handle the confirmation button click."""
-        print("Não confirmado!!")
-        return
+        user_confirmed: bool = discord.utils.find(
+            lambda p: p.discord_id == interaction.user.id,
+            self.cog.confirmed_players,
+        )
+
+        if user_confirmed:
+            self.cog.confirmed_players.remove(user_confirmed)
+
+            await interaction.response.send_message(
+                "Participação cancelada.",
+                ephemeral=True,
+                delete_after=30,
+            )
+            return
+        await interaction.response.send_message(
+            "Você não confirmou sua participação.",
+            ephemeral=True,
+            delete_after=30,
+        )
+
+    @override
+    async def on_timeout(self, interaction: discord.Interaction):
+        for child in self.children:
+            child.disabled = True

@@ -33,10 +33,21 @@ class MatchCog(commands.Cog):
         if not players_loaded:
             return
 
+        confirmation_view = ConfirmParticipationView(self.available_players, cog=self)
+
         await interaction.response.send_message(
             embed=list_players_embed(self.available_players),  # type: ignore
-            view=ConfirmParticipationView(self.available_players, cog=self),  # type: ignore
+            view=confirmation_view,  # type: ignore
         )
+
+        message = await interaction.original_response()
+
+        confirmation_view.message = message
+
+        timed_out = await confirmation_view.wait()
+
+        if timed_out:
+            return
 
     async def _load_all_players(
         self,
