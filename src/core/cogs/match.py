@@ -1,7 +1,4 @@
-from configparser import ConfigParser
-from os import wait
 from typing import Optional
-import random
 import logging
 import discord
 from discord import app_commands
