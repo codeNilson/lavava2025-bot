@@ -32,7 +32,7 @@ class ConfirmParticipationView(discord.ui.View):
 
     @discord.ui.button(
         label="Bora jogar!",
-        style=discord.ButtonStyle.green,
+        style=discord.ButtonStyle.success,
         emoji="🔥",
     )
     async def confirm_button(
@@ -62,9 +62,6 @@ class ConfirmParticipationView(discord.ui.View):
         # Adiciona à lista de confirmados
         self.cog.confirmed_players.append(user_player)
 
-        # Atualiza o embed
-        from .embeds import list_players_embed
-
         updated_embed = list_players_embed(
             self.available_players, self.cog.confirmed_players, self.cog.denied_players
         )
@@ -73,7 +70,7 @@ class ConfirmParticipationView(discord.ui.View):
 
     @discord.ui.button(
         label="Dessa vez não",
-        style=discord.ButtonStyle.secondary,
+        style=discord.ButtonStyle.red,
         emoji="❌",
     )
     async def deny_button(
@@ -108,6 +105,16 @@ class ConfirmParticipationView(discord.ui.View):
         )
 
         await interaction.response.edit_message(embed=updated_embed, view=self)
+
+    @discord.ui.button(
+        label="⚡️ Iniciar Partida",
+        style=discord.ButtonStyle.secondary,
+        # emoji="",
+    )
+    async def start_button(
+        self, interaction: discord.Interaction, _: discord.ui.Button
+    ) -> None:
+        self.stop()
 
     async def on_timeout(self) -> None:
         for child in self.children:

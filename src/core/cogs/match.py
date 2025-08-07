@@ -49,6 +49,10 @@ class MatchCog(commands.Cog):
         if timed_out:
             return
 
+        await interaction.response.send_message(
+            "A partida foi iniciada com os jogadores confirmados."
+        )
+
     async def _load_all_players(
         self,
         interaction: discord.Interaction,

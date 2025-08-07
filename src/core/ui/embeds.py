@@ -10,7 +10,7 @@ def list_players_embed(
     denied_players: Optional[list[Player]] = None,
 ) -> discord.Embed:
     """Create an embed listing all players with their confirmation status."""
-    embed = discord.Embed(title="🏆 Partida Lavava 2025", color=discord.Color.blue())
+    embed = discord.Embed(title="🏆 Partida Lavava 2025", color=discord.Color.red())
     embed.description = (
         "⚔️ **Uma nova partida está sendo formada!**\n\n"
         "Todos os jogadores listados abaixo estão **qualificados** para participar. "
