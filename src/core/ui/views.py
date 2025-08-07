@@ -126,6 +126,12 @@ class ConfirmParticipationView(discord.ui.View):
             )
             return
 
+        # Responder antes de parar a view
+        await interaction.response.send_message(
+            "🚀 Partida iniciada! Preparando os times...",
+            ephemeral=True,
+        )
+
         self.stop()
 
     async def on_timeout(self) -> None:
