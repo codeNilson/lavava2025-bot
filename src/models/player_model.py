@@ -1,9 +1,11 @@
+from typing import Optional
+
 class Player:
     def __init__(
         self,
         username: str,
-        discordId: int,
         *args,
+        discordId: Optional[int] = None,
         **kwargs,
     ) -> None:
         self.username = username

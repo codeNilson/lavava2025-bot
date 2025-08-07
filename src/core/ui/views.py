@@ -109,29 +109,41 @@ class ConfirmParticipationView(discord.ui.View):
     @discord.ui.button(
         label="⚡️ Iniciar Partida",
         style=discord.ButtonStyle.secondary,
-        # emoji="",
     )
     async def start_button(
         self, interaction: discord.Interaction, _: discord.ui.Button
     ) -> None:
+        """Handle the start match button click."""
+
+        # Cast para Member
+        member = interaction.user
+        assert isinstance(member, discord.Member)
+
+        if not member.guild_permissions.administrator:
+            await interaction.response.send_message(
+                "❌ Você não tem permissão para iniciar a partida.",
+                ephemeral=True,
+            )
+            return
+
         self.stop()
 
     async def on_timeout(self) -> None:
         for child in self.children:
             child.disabled = True  # type: ignore
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        user_player: Optional[Player] = self._find_player_in_available(
-            interaction.user.id
-        )
-        print(user_player)
+    # async def interaction_check(self, interaction: discord.Interaction) -> bool:
+    #     user_player: Optional[Player] = self._find_player_in_available(
+    #         interaction.user.id
+    #     )
+    #     print(user_player)
 
-        if not user_player:
-            await interaction.response.send_message(
-                "Você não está na lista de jogadores disponíveis.",
-                ephemeral=True,
-                delete_after=5,
-            )
-            return False
+    #     if not user_player:
+    #         await interaction.response.send_message(
+    #             "Você não está na lista de jogadores disponíveis.",
+    #             ephemeral=True,
+    #             delete_after=5,
+    #         )
+    #         return False
 
-        return True
+    #     return True

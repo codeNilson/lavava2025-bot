@@ -49,7 +49,7 @@ class MatchCog(commands.Cog):
         if timed_out:
             return
 
-        await interaction.response.send_message(
+        await interaction.followup.send(
             "A partida foi iniciada com os jogadores confirmados."
         )
 
