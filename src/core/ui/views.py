@@ -71,7 +71,7 @@ class ConfirmParticipationView(discord.ui.View):
     @discord.ui.button(
         label="Dessa vez não",
         style=discord.ButtonStyle.red,
-        emoji="❌",
+        emoji="🏳️",
     )
     async def deny_button(
         self, interaction: discord.Interaction, _: discord.ui.Button
@@ -146,19 +146,3 @@ class ConfirmParticipationView(discord.ui.View):
             color=discord.Color.orange(),
         )
         await self.message.edit(embed=timeout_embed, view=None)
-
-    # async def interaction_check(self, interaction: discord.Interaction) -> bool:
-    #     user_player: Optional[Player] = self._find_player_in_available(
-    #         interaction.user.id
-    #     )
-    #     print(user_player)
-
-    #     if not user_player:
-    #         await interaction.response.send_message(
-    #             "Você não está na lista de jogadores disponíveis.",
-    #             ephemeral=True,
-    #             delete_after=5,
-    #         )
-    #         return False
-
-    #     return True
