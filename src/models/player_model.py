@@ -1,5 +1,6 @@
 from typing import Optional
 
+
 class Player:
     def __init__(
         self,
@@ -8,11 +9,11 @@ class Player:
         discordId: Optional[int] = None,
         **kwargs,
     ) -> None:
-        self.username = username
-        self.discord_id = discordId
+        self.username: str = username
+        self.discord_id: Optional[int] = discordId
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.username}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"PlayerModel(username={self.username}, discord_id={self.discord_id})"

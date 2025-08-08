@@ -33,11 +33,11 @@ class RegistrationCog(commands.Cog):
             print(f"{member.name} was banned. Reason: {ban_reason}")
 
     @app_commands.command(
-        name="registrar",
+        name="registrar jogador",
         description="Registrar novo jogador",
     )
     @app_commands.default_permissions(administrator=True)
-    async def register(
+    async def register_admin(
         self, interaction: discord.Interaction, membro: discord.Member
     ) -> None:
         """Register a new player."""
