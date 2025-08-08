@@ -16,7 +16,7 @@ class ConfirmParticipationView(discord.ui.View):
     """View to confirm participation in a match."""
 
     def __init__(self, players: list[Player], cog: "MatchCog") -> None:
-        super().__init__(timeout=60)
+        super().__init__(timeout=120)  # 2 minutes timeout
         self.players: list[Player] = players
         self.cog: "MatchCog" = cog
         self.available_players: list[Player] = self.cog.available_players or []
@@ -121,22 +121,31 @@ class ConfirmParticipationView(discord.ui.View):
 
         if not member.guild_permissions.administrator:
             await interaction.response.send_message(
-                "❌ Você não tem permissão para iniciar a partida.",
+                "❌ Somente um adm pode iniciar a partida.",
                 ephemeral=True,
+                delete_after=5,
             )
             return
 
-        # Responder antes de parar a view
         await interaction.response.send_message(
             "🚀 Partida iniciada! Preparando os times...",
             ephemeral=True,
+            delete_after=5,
         )
 
         self.stop()
 
     async def on_timeout(self) -> None:
-        for child in self.children:
-            child.disabled = True  # type: ignore
+        """Remove view when timeout occurs."""
+        if not self.message:
+            return
+
+        timeout_embed = discord.Embed(
+            title="⏰ Tempo Esgotado",
+            description="O tempo para confirmar participação expirou.",
+            color=discord.Color.orange(),
+        )
+        await self.message.edit(embed=timeout_embed, view=None)
 
     # async def interaction_check(self, interaction: discord.Interaction) -> bool:
     #     user_player: Optional[Player] = self._find_player_in_available(

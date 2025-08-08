@@ -15,7 +15,7 @@ def list_players_embed(
         "⚔️ **Uma nova partida está sendo formada!**\n\n"
         "Todos os jogadores listados abaixo estão **qualificados** para participar. "
         "Use os botões para **confirmar** se você irá jogar ou **recusar** se não puder participar desta vez.\n\n"
-        "⏰ **Tempo limite:** 1 minuto para confirmação"
+        "⏰ **Tempo limite:** 2 minutos para confirmação"
     )
 
     # Listas para controle de status
