@@ -3,7 +3,7 @@ from typing import Optional, TYPE_CHECKING
 import discord
 from discord.utils import find
 from src.models.player_model import Player
-from .embeds import list_players_embed
+from ..embeds import list_players_embed
 
 if TYPE_CHECKING:
     from src.core.cogs.match import MatchCog

@@ -1,0 +1,1 @@
+from .confirm_participation_view import ConfirmParticipationView
