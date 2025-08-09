@@ -61,7 +61,7 @@ class MatchCog(commands.Cog):
 
         players_data = await get_all_players()
 
-        if len(players_data) < 0 or not players_data:
+        if len(players_data) < 10 or not players_data:
             await interaction.response.send_message(
                 "Não há jogadores suficientes para iniciar uma partida.",
                 delete_after=10,
