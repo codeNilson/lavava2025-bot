@@ -3,8 +3,13 @@ import random
 import discord
 from discord import app_commands
 from discord.ext import commands
-from src.core.ui.embeds import captains_choose, list_players_embed
+from src.core.ui.embeds import (
+    captains_choose,
+    choose_captains_embed,
+    list_players_embed,
+)
 from src.core.ui.views import ConfirmParticipationView
+from src.core.ui.views.players_buttons_view import PlayersButtonsView
 from src.services.player_service import get_all_players
 
 from src.models.player_model import Player
@@ -107,7 +112,42 @@ class MatchCog(commands.Cog):
     @app_commands.default_permissions(administrator=True)
     async def choose_players(self, interaction: discord.Interaction):
         """List available players for the match."""
-        pass
+
+        self.first_captain_team.clear()
+        self.second_captain_team.clear()
+
+        if not self.first_captain or not self.second_captain:
+            await interaction.response.send_message(
+                "Nenhum capitão foi escolhido ainda.", ephemeral=True
+            )
+            return
+
+        self.first_captain_team.append(self.first_captain)
+        self.second_captain_team.append(self.second_captain)
+
+        view = PlayersButtonsView(self)
+
+        print("Available players:", len(self.available_players))
+        for player in self.available_players:
+            view.add_player_button(player)
+
+        await interaction.response.send_message(
+            embed=choose_captains_embed(
+                self.first_captain_team,
+                self.second_captain_team,
+            ),
+            view=PlayersButtonsView(self),
+        )
+
+        message = await interaction.original_response()
+        view.message = message
+
+        timed_out = await view.wait()
+
+        if timed_out:
+            await interaction.followup.send(
+                "O tempo para escolher os jogadores acabou."
+            )
 
 
 async def setup(bot: commands.Bot):
