@@ -1,8 +1,10 @@
 import logging
+import random
 import discord
 from discord import app_commands
 from discord.ext import commands
-from src.core.ui.embeds import list_players_embed
+from src.core.cogs import admin
+from src.core.ui.embeds import captains_choose, list_players_embed
 from src.core.ui.views import ConfirmParticipationView
 from src.services.player_service import get_all_players
 
@@ -17,6 +19,9 @@ class MatchCog(commands.Cog):
         self.available_players: list[Player] = []
         self.confirmed_players: list[Player] = []
         self.denied_players: list[Player] = []
+
+        self.first_captain: Player | None = None
+        self.second_captain: Player | None = None
 
     @app_commands.command(
         name="confirmar_participantes",
@@ -61,7 +66,7 @@ class MatchCog(commands.Cog):
 
         players_data = await get_all_players()
 
-        if len(players_data) < 10 or not players_data:
+        if len(players_data) < 0 or not players_data:
             await interaction.response.send_message(
                 "Não há jogadores suficientes para iniciar uma partida.",
                 delete_after=10,
@@ -69,6 +74,29 @@ class MatchCog(commands.Cog):
             return False
         self.available_players = [Player(**player) for player in players_data]
         return True
+
+    @app_commands.command(
+        name="sortear-capitães",
+        description="Sortear capitães para a partida.",
+    )
+    @app_commands.default_permissions(administrator=True)
+    async def choose_captains(self, interaction: discord.Interaction):
+        if len(self.available_players) < 2:
+            await interaction.response.send_message(
+                "É necessário pelo menos 2 jogadores confirmados para sortear capitães.",
+                ephemeral=True,
+            )
+            return
+        self.first_captain, self.second_captain = random.sample(
+            self.available_players, 2
+        )
+
+        await interaction.response.send_message(
+            embed=captains_choose(
+                self.first_captain,
+                self.second_captain,
+            ),
+        )
 
 
 async def setup(bot: commands.Bot):

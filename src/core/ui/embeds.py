@@ -51,3 +51,37 @@ def list_players_embed(
     )
 
     return embed
+
+
+def captains_choose(
+    first_captain: Player,
+    second_captain: Player,
+) -> discord.Embed:
+    """Create an embed showing the chosen captains."""
+    embed = discord.Embed(
+        title="⚔️ Capitães Escolhidos",
+        description="Os capitães foram selecionados aleatoriamente para a próxima partida.",
+        color=discord.Color.blue(),
+    )
+
+    embed.add_field(
+        name="Capitão 1",
+        value=f"🗡️ {first_captain.mention}",
+        inline=True,
+    )
+
+    embed.add_field(
+        name="",
+        value="",
+        inline=True,
+    )
+
+    embed.add_field(
+        name="Capitão 2",
+        value=f"🛡️ {second_captain.mention}",
+        inline=True,
+    )
+
+    embed.set_footer(text="Hora de formar as equipes! Boa sorte aos capitães!")
+
+    return embed
