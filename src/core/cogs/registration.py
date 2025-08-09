@@ -3,11 +3,10 @@ from typing import Union
 import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
-from discord import app_commands
 
 from ...services.player_service import register_new_player
 
-logger = logging.getLogger("lavava.cog.registration")
+logger = logging.getLogger(f"lavava.cog.{__name__}")
 
 
 class RegistrationCog(commands.Cog):
@@ -31,22 +30,6 @@ class RegistrationCog(commands.Cog):
             ban_entry = await member.guild.fetch_ban(member)
             ban_reason = ban_entry.reason if ban_entry.reason else "No reason provided"
             print(f"{member.name} was banned. Reason: {ban_reason}")
-
-    @app_commands.command(
-        name="registrar",
-        description="Registrar novo jogador",
-    )
-    @app_commands.describe(membro="Membro do Discord a ser registrado")
-    @app_commands.default_permissions(administrator=True)
-    async def register(
-        self, interaction: discord.Interaction, membro: discord.Member
-    ) -> None:
-        """Register a new player."""
-
-        await register_new_player(membro)
-        await interaction.response.send_message(
-            f"✅ Jogador {membro.name} registrado com sucesso!", ephemeral=True
-        )
 
 
 async def setup(bot: commands.Bot):

@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 
-logger = logging.getLogger("lavava.bot")
+logger = logging.getLogger(f"lavava.{__name__}")
 
 GUILD_ID = discord.Object(1372683948554977350)
 
