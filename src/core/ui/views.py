@@ -130,7 +130,6 @@ class ConfirmParticipationView(discord.ui.View):
         await interaction.response.send_message(
             "🚀 Partida iniciada! Preparando os times...",
             ephemeral=True,
-            delete_after=5,
         )
 
         self.stop()
