@@ -3,7 +3,6 @@ import random
 import discord
 from discord import app_commands
 from discord.ext import commands
-from src.core.cogs import admin
 from src.core.ui.embeds import captains_choose, list_players_embed
 from src.core.ui.views import ConfirmParticipationView
 from src.services.player_service import get_all_players
@@ -21,7 +20,10 @@ class MatchCog(commands.Cog):
         self.denied_players: list[Player] = []
 
         self.first_captain: Player | None = None
+        self.first_captain_team: list[Player] = []
+
         self.second_captain: Player | None = None
+        self.second_captain_team: list[Player] = []
 
     @app_commands.command(
         name="confirmar_participantes",
@@ -97,6 +99,15 @@ class MatchCog(commands.Cog):
                 self.second_captain,
             ),
         )
+
+    @app_commands.command(
+        name="escolher-jogadores",
+        description="Listar jogadores disponíveis.",
+    )
+    @app_commands.default_permissions(administrator=True)
+    async def choose_players(self, interaction: discord.Interaction):
+        """List available players for the match."""
+        pass
 
 
 async def setup(bot: commands.Bot):

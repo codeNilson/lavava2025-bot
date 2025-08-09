@@ -85,3 +85,31 @@ def captains_choose(
     embed.set_footer(text="Hora de formar as equipes! Boa sorte aos capitães!")
 
     return embed
+
+
+def choose_captains_embed(
+    first_team: list[Player],
+    second_team: list[Player],
+) -> discord.Embed:
+    """Create an embed showing the players to choose."""
+    embed = discord.Embed(
+        title="⚔️ Escolha dos Jogadores",
+        description="Os capitães devem escolher seus jogadores para a partida.",
+        color=discord.Color.green(),
+    )
+
+    embed.add_field(
+        name="🗡️ Time Atacante",
+        value="\n".join(player.mention for player in first_team),
+        inline=True,
+    )
+
+    embed.add_field(
+        name="🛡️ Time Defensor",
+        value="\n".join(player.mention for player in second_team),
+        inline=True,
+    )
+
+    embed.set_footer(text="Lembrete: o segundo capitão escolhe 2x no 6º pick.")
+
+    return embed
