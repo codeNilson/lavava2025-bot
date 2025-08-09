@@ -1,6 +1,7 @@
 import logging
 import asyncio
 import discord
+
 from ..api import fetch_api
 from ..error.api_errors import ResourceAlreadyExistsError
 
@@ -17,6 +18,10 @@ async def get_all_players():
 
 
 async def register_new_player(player: discord.Member):
+
+    if "Jogador" in [role.name for role in player.roles]:
+        raise ResourceAlreadyExistsError(f"Player {player.name} is already registered.")
+
     await fetch_api(
         PLAYERS_ENDPOINT,
         method="POST",
@@ -24,6 +29,15 @@ async def register_new_player(player: discord.Member):
             "username": player.name,
             "discordId": player.id,
         },
+    )
+
+    jogador_role = discord.utils.get(player.guild.roles, name="Jogador")
+    if jogador_role is None:
+        logger.error('"Jogador" role not found in guild %s', player.guild.name)
+        raise ValueError('"Jogador" role not found in this guild.')
+    await player.add_roles(
+        jogador_role,
+        reason="Player registered via bot command",
     )
 
 

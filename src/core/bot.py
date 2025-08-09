@@ -62,14 +62,12 @@ class LavavaBot(commands.Bot):
             logger.info(
                 "Bot is ready. Logged in as %s (ID: %s)", self.user.name, self.user.id
             )
-        else:
-            logger.info("Bot is ready, but user information is not available.")
 
     @override
     async def setup_hook(self):
         await self.load_extension("src.core.cogs.admin")
         await self.load_extension("src.core.cogs.funny")
-        await self.load_extension("src.core.cogs.registration")
+        await self.load_extension("src.core.cogs.player")
         await self.load_extension("src.core.cogs.match")
         self.tree.copy_global_to(guild=GUILD_ID)
         await self.tree.sync(guild=GUILD_ID)
