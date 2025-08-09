@@ -17,23 +17,14 @@ async def get_all_players():
 
 
 async def register_new_player(player: discord.Member):
-
-    try:
-        await fetch_api(
-            PLAYERS_ENDPOINT,
-            method="POST",
-            data={
-                "username": player.name,
-                "discordId": player.id,
-            },
-        )
-    except ResourceAlreadyExistsError:
-        logger.debug(
-            "Player %s (ID: %s) already exists in the database.",
-            player.name,
-            player.id,
-        )
-        return
+    await fetch_api(
+        PLAYERS_ENDPOINT,
+        method="POST",
+        data={
+            "username": player.name,
+            "discordId": player.id,
+        },
+    )
 
 
 async def deactivate_player(player: discord.Member, reason: str):

@@ -1,7 +1,11 @@
 import logging
 from typing import override
+
 import discord
+from discord import app_commands
 from discord.ext import commands
+
+from src.error.api_errors import ResourceAlreadyExistsError
 
 
 logger = logging.getLogger(f"lavava.{__name__}")
@@ -20,7 +24,7 @@ class LavavaBot(commands.Bot):
     async def on_app_command_error(
         self, interaction: discord.Interaction, error: Exception
     ):
-        if isinstance(error, commands.CommandNotFound):
+        if isinstance(error, app_commands.CommandNotFound):
             await interaction.response.send_message(
                 "Esse comando não existe. Cê é burrão hein?", ephemeral=True
             )
@@ -28,7 +32,7 @@ class LavavaBot(commands.Bot):
                 "User tried to use a non-existent command: %s",
                 interaction.command.name,  # type: ignore
             )
-        elif isinstance(error, commands.MissingPermissions):
+        elif isinstance(error, app_commands.MissingPermissions):
             await interaction.response.send_message(
                 "Você não tem permissão para usar este comando.", ephemeral=True
             )
@@ -37,6 +41,15 @@ class LavavaBot(commands.Bot):
                 interaction.user.name,
                 interaction.command.name,  # type: ignore
             )
+        elif isinstance(error, app_commands.CommandInvokeError):
+            original_error = error.original
+
+            if isinstance(original_error, ResourceAlreadyExistsError):
+                await interaction.response.send_message(
+                    "Esse jogador já está registrado.",
+                    ephemeral=True,
+                )
+                logger.debug("ResourceAlreadyExistsError: %s", original_error)
         else:
             await interaction.response.send_message(
                 "Um erro desconhecido ocorreu. Tente novamente mais ou contate um admin.",
