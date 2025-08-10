@@ -45,23 +45,45 @@ class PlayersButtonsView(discord.ui.View):
                 or not self.cog.current_match.second_captain
             ):
                 await interaction.response.send_message(
-                    "Nenhum capitão foi escolhido ainda.", ephemeral=True
+                    "Nenhum capitão foi escolhido ainda.",
+                    ephemeral=True,
+                    delete_after=30,
                 )
                 return
 
-            if interaction.user.id == self.cog.current_match.first_captain.discord_id:
+            if (
+                interaction.user.id == self.cog.current_match.first_captain.discord_id
+                and self.cog.current_match.is_first_captain_turn
+            ):
                 self.cog.current_match.first_captain_team.append(player)
             elif (
                 interaction.user.id == self.cog.current_match.second_captain.discord_id
+                and not self.cog.current_match.is_first_captain_turn
             ):
                 self.cog.current_match.second_captain_team.append(player)
-            else:
+            elif interaction.user.id in (
+                self.cog.current_match.first_captain.discord_id,
+                self.cog.current_match.second_captain.discord_id,
+            ):
                 await interaction.response.send_message(
-                    "Você não é um capitão e não pode escolher jogadores.",
+                    "Ainda não é sua vez de escolher.",
                     ephemeral=True,
                     delete_after=5,
                 )
                 return
+
+            else:
+                await interaction.response.send_message(
+                    "Apenas capitães podem escolher jogadores.",
+                    ephemeral=True,
+                    delete_after=5,
+                )
+                return
+
+            # Altera a vez do capitão
+            self.cog.current_match.is_first_captain_turn = (
+                not self.cog.current_match.is_first_captain_turn
+            )
 
             for button in self.children:
                 if not isinstance(button, discord.ui.Button):

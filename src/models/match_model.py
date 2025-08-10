@@ -15,6 +15,8 @@ class Match:
     second_captain: Optional[Player] = None
     second_captain_team: list[Player] = field(default_factory=list)
 
+    is_first_captain_turn: bool = True
+
     def setup_team_selection(self):
         """Prepare team selection by clearing teams and adding captains."""
         self.first_captain_team.clear()
@@ -33,3 +35,4 @@ class Match:
         self.first_captain_team.clear()
         self.second_captain = None
         self.second_captain_team.clear()
+        self.is_first_captain_turn = True
