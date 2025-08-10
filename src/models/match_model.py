@@ -17,6 +17,8 @@ class Match:
 
     is_first_captain_turn: bool = True
 
+    map_choose: Optional[str] = None
+
     def setup_team_selection(self):
         """Prepare team selection by clearing teams and adding captains."""
         self.first_captain_team.clear()
@@ -36,3 +38,4 @@ class Match:
         self.second_captain = None
         self.second_captain_team.clear()
         self.is_first_captain_turn = True
+        self.map_choose = None

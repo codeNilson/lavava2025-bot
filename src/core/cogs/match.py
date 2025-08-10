@@ -151,7 +151,7 @@ class MatchCog(commands.Cog):
     )
     async def choose_maps(self, interaction: discord.Interaction) -> None:
 
-        view = SelectMapView()
+        view = SelectMapView(self)
 
         await interaction.response.send_message(
             view=view,
@@ -160,7 +160,7 @@ class MatchCog(commands.Cog):
         view.message = await interaction.original_response()
 
         timed_out: bool = await view.wait()
-        
+
         if timed_out:
             await interaction.followup.send("O tempo para escolher os mapas acabou.")
             return
