@@ -4,6 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from src.core.ui.views.select_maps_view import SelectMapView
 from src.models.match_model import Match
 from src.models.player_model import Player
 from src.core.ui.embeds import (
@@ -24,9 +25,10 @@ class MatchCog(commands.Cog):
         self.current_match = Match()
 
     @app_commands.command(
-        name="confirmar_participantes",
-        description="Escolher capitães para a partida.",
+        name="confirmar-participantes",
+        description="Confirmar jogadores para a partida.",
     )
+    @app_commands.default_permissions(administrator=True)
     async def confirm_players(self, interaction: discord.Interaction) -> None:
         self.current_match.confirmed_players.clear()
 
@@ -43,7 +45,7 @@ class MatchCog(commands.Cog):
             view=confirmation_view,
         )
 
-        message = await interaction.original_response()
+        message: discord.InteractionMessage = await interaction.original_response()
         confirmation_view.message = message
 
         timed_out = await confirmation_view.wait()
@@ -70,11 +72,17 @@ class MatchCog(commands.Cog):
         ]
         return True
 
-    @app_commands.command(
-        name="sortear-capitães",
+    match_making = app_commands.Group(
+        name="escolher",
+        description="Comandos para escolher capitães e jogadores.",
+        guild_only=True,
+        default_permissions=discord.Permissions(administrator=True),
+    )
+
+    @match_making.command(
+        name="capitães",
         description="Sortear capitães para a partida.",
     )
-    @app_commands.default_permissions(administrator=True)
     async def choose_captains(self, interaction: discord.Interaction):
         if len(self.current_match.confirmed_players) < 2:
             await interaction.response.send_message(
@@ -94,12 +102,11 @@ class MatchCog(commands.Cog):
             ),
         )
 
-    @app_commands.command(
-        name="escolher-jogadores",
-        description="Listar jogadores disponíveis.",
+    @match_making.command(
+        name="jogadores",
+        description="iniciar a escolha de jogadores para a partida.",
     )
-    @app_commands.default_permissions(administrator=True)
-    async def choose_players(self, interaction: discord.Interaction):
+    async def choose_players(self, interaction: discord.Interaction) -> None:
         """List available players for the match."""
         self.current_match.setup_team_selection()
 
@@ -125,10 +132,10 @@ class MatchCog(commands.Cog):
             view=view,
         )
 
-        message = await interaction.original_response()
+        message: discord.InteractionMessage = await interaction.original_response()
         view.message = message
 
-        timed_out = await view.wait()
+        timed_out: bool = await view.wait()
         if timed_out:
             await interaction.followup.send(
                 "O tempo para escolher os jogadores acabou."
@@ -137,6 +144,26 @@ class MatchCog(commands.Cog):
         await interaction.followup.send(
             "As equipes foram formadas. Hora de escolherem o bans de mapa!",
         )
+
+    @match_making.command(
+        name="mapas",
+        description="iniciar a escolha de jogadores para a partida.",
+    )
+    async def choose_maps(self, interaction: discord.Interaction) -> None:
+
+        view = SelectMapView()
+
+        await interaction.response.send_message(
+            view=view,
+        )
+
+        view.message = await interaction.original_response()
+
+        timed_out: bool = await view.wait()
+        
+        if timed_out:
+            await interaction.followup.send("O tempo para escolher os mapas acabou.")
+            return
 
 
 async def setup(bot: commands.Bot):
