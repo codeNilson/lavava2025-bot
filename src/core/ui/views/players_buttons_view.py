@@ -51,28 +51,40 @@ class PlayersButtonsView(discord.ui.View):
                 )
                 return
 
-            if (
-                interaction.user.id == self.cog.current_match.first_captain.discord_id
-                and self.cog.current_match.is_first_captain_turn
-            ):
-                self.cog.current_match.first_captain_team.append(player)
-            elif (
-                interaction.user.id == self.cog.current_match.second_captain.discord_id
-                and not self.cog.current_match.is_first_captain_turn
-            ):
-                self.cog.current_match.second_captain_team.append(player)
-            elif interaction.user.id in (
-                self.cog.current_match.first_captain.discord_id,
-                self.cog.current_match.second_captain.discord_id,
-            ):
-                await interaction.response.send_message(
-                    "Ainda não é sua vez de escolher.",
-                    ephemeral=True,
-                    delete_after=5,
-                )
-                return
+            # Total de picks realizados (excluindo os próprios capitães que já estão nas listas)
+            picks_made = (
+                len(self.cog.current_match.first_captain_team)
+                - 1
+                + len(self.cog.current_match.second_captain_team)
+                - 1
+            )
 
-            else:
+            # Ordem personalizada: F: 1,3,5,8 | S: 2,4,6,7
+            pick_index = picks_made + 1  # 1-based
+            first_turn_indices = {1, 3, 5, 8}
+            is_first_turn_now = pick_index in first_turn_indices
+
+            first_captain = self.cog.current_match.first_captain
+            second_captain = self.cog.current_match.second_captain
+
+            current_turn_captain = (
+                first_captain if is_first_turn_now else second_captain
+            )
+
+            # Bloqueia a inteRação de quem não é o capitão da vez
+            if interaction.user.id != current_turn_captain.discord_id:
+                # Se for capitao, mas fora de turno
+                if interaction.user.id in (
+                    first_captain.discord_id,
+                    second_captain.discord_id,
+                ):
+                    await interaction.response.send_message(
+                        "Ainda não é sua vez de escolher.",
+                        ephemeral=True,
+                        delete_after=5,
+                    )
+                    return
+                # Se não for capitao
                 await interaction.response.send_message(
                     "Apenas capitães podem escolher jogadores.",
                     ephemeral=True,
@@ -80,17 +92,33 @@ class PlayersButtonsView(discord.ui.View):
                 )
                 return
 
-            # Altera a vez do capitão
+            # Aplica a escolha ao time correto
+            if is_first_turn_now:
+                self.cog.current_match.first_captain_team.append(player)
+            else:
+                self.cog.current_match.second_captain_team.append(player)
+
+            # Atualiza a flag de turno para refletir o próximo pick, mantendo compatibilidade
+            new_picks_made = picks_made + 1
+            next_pick_index = new_picks_made + 1
             self.cog.current_match.is_first_captain_turn = (
-                not self.cog.current_match.is_first_captain_turn
+                next_pick_index in first_turn_indices
             )
 
             for button in self.children:
                 if not isinstance(button, discord.ui.Button):
-                    return
+                    continue
                 if button.custom_id == player.username:
                     button.disabled = True
                     button.style = discord.ButtonStyle.secondary
+
+            # Se chegamos ao último pick, desabilita todos os botões
+            if new_picks_made >= 8:
+                for button in self.children:
+                    if isinstance(button, discord.ui.Button):
+                        button.disabled = True
+                        button.style = discord.ButtonStyle.secondary
+                self.stop()
 
             await interaction.response.edit_message(
                 embed=choose_captains_embed(

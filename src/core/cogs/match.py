@@ -58,7 +58,7 @@ class MatchCog(commands.Cog):
         """Load all players from the database."""
         players_data = await get_all_players()
 
-        if len(players_data) < 1:  # WIP: Mudar para < 10
+        if len(players_data) < 10:
             await interaction.response.send_message(
                 "Não há jogadores suficientes para iniciar uma partida.",
                 delete_after=10,
@@ -76,7 +76,7 @@ class MatchCog(commands.Cog):
     )
     @app_commands.default_permissions(administrator=True)
     async def choose_captains(self, interaction: discord.Interaction):
-        if len(self.current_match.available_players) < 2:
+        if len(self.current_match.confirmed_players) < 2:
             await interaction.response.send_message(
                 "É necessário pelo menos 2 jogadores confirmados para sortear capitães.",
                 ephemeral=True,
@@ -84,7 +84,7 @@ class MatchCog(commands.Cog):
             return
 
         (self.current_match.first_captain, self.current_match.second_captain) = (
-            random.sample(self.current_match.available_players, 2)
+            random.sample(self.current_match.confirmed_players, 2)
         )
 
         await interaction.response.send_message(
@@ -133,6 +133,11 @@ class MatchCog(commands.Cog):
             await interaction.followup.send(
                 "O tempo para escolher os jogadores acabou."
             )
+
+        await interaction.followup.send(
+            "As equipes foram formadas. Hora de escolherem o bans de mapa!",
+        )
+
 
 async def setup(bot: commands.Bot):
     """Load the MatchCog."""
