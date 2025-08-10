@@ -15,7 +15,7 @@ class Player:
     @property
     def mention(self) -> str:
         """Return the mention of the player."""
-        return f"<@{self.username}>" if self.discord_id else self.username
+        return f"<@{self.discord_id}>" if self.discord_id else self.username
 
     def __str__(self) -> str:
         return f"{self.username}"

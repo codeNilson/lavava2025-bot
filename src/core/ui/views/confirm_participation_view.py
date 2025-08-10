@@ -19,7 +19,9 @@ class ConfirmParticipationView(discord.ui.View):
         super().__init__(timeout=120)  # 2 minutes timeout
         self.players: list[Player] = players
         self.cog: "MatchCog" = cog
-        self.available_players: list[Player] = self.cog.available_players or []
+        self.available_players: list[Player] = (
+            self.cog.current_match.available_players or []
+        )
         self.message: Optional[discord.Message] = None
 
     def _find_player_in_available(self, user_id: int) -> Optional[Player]:
@@ -28,7 +30,9 @@ class ConfirmParticipationView(discord.ui.View):
 
     def _user_has_confirmed(self, user_id: int) -> bool:
         """Check if a user has already confirmed participation."""
-        return any(p.discord_id == user_id for p in self.cog.confirmed_players)
+        return any(
+            p.discord_id == user_id for p in self.cog.current_match.confirmed_players
+        )
 
     @discord.ui.button(
         label="Bora jogar!",
@@ -52,18 +56,22 @@ class ConfirmParticipationView(discord.ui.View):
             return
 
         # Remove das listas se já estava em alguma
-        self.cog.confirmed_players = [
-            p for p in self.cog.confirmed_players if p.discord_id != user_id
+        self.cog.current_match.confirmed_players = [
+            p
+            for p in self.cog.current_match.confirmed_players
+            if p.discord_id != user_id
         ]
-        self.cog.denied_players = [
-            p for p in self.cog.denied_players if p.discord_id != user_id
+        self.cog.current_match.denied_players = [
+            p for p in self.cog.current_match.denied_players if p.discord_id != user_id
         ]
 
         # Adiciona à lista de confirmados
-        self.cog.confirmed_players.append(user_player)
+        self.cog.current_match.confirmed_players.append(user_player)
 
         updated_embed = list_players_embed(
-            self.available_players, self.cog.confirmed_players, self.cog.denied_players
+            self.available_players,
+            self.cog.current_match.confirmed_players,
+            self.cog.current_match.denied_players,
         )
 
         await interaction.response.edit_message(embed=updated_embed, view=self)
@@ -90,18 +98,22 @@ class ConfirmParticipationView(discord.ui.View):
             return
 
         # Remove das listas se já estava em alguma
-        self.cog.confirmed_players = [
-            p for p in self.cog.confirmed_players if p.discord_id != user_id
+        self.cog.current_match.confirmed_players = [
+            p
+            for p in self.cog.current_match.confirmed_players
+            if p.discord_id != user_id
         ]
-        self.cog.denied_players = [
-            p for p in self.cog.denied_players if p.discord_id != user_id
+        self.cog.current_match.denied_players = [
+            p for p in self.cog.current_match.denied_players if p.discord_id != user_id
         ]
 
         # Adiciona à lista de negados
-        self.cog.denied_players.append(user_player)
+        self.cog.current_match.denied_players.append(user_player)
 
         updated_embed = list_players_embed(
-            self.available_players, self.cog.confirmed_players, self.cog.denied_players
+            self.available_players,
+            self.cog.current_match.confirmed_players,
+            self.cog.current_match.denied_players,
         )
 
         await interaction.response.edit_message(embed=updated_embed, view=self)
