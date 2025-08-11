@@ -122,29 +122,29 @@ def build_team_selection_embed(
 async def build_match_result_embed(match: Match) -> discord.Embed:
     """Create an embed showing the match details."""
 
-    if match.map_choose is None:
+    if match.selected_map is None:
         return discord.Embed(
             title="⚠️ Erro",
             description="Nenhum mapa foi escolhido para a partida.",
             color=discord.Color.red(),
         )
 
-    map_data = await get_map(match.map_choose)
+    map_data = await get_map(match.selected_map)
 
     embed = discord.Embed(
-        title=f"🏆 Partida Lavava 2025 - {match.map_choose}",
+    title=f"🏆 Partida Lavava 2025 - {match.selected_map}",
         description="Partida formada! Boa sorte!",
         color=discord.Color.red(),
     )
 
     embed.add_field(
-        name="🗡️ Time Atacante",
-        value="\n".join(player.mention for player in match.first_captain_team),
+    name="🗡️ Time Atacante",
+    value="\n".join(player.mention for player in match.attacking_team),
         inline=True,
     )
     embed.add_field(
-        name="🛡️ Time Defensor",
-        value="\n".join(player.mention for player in match.second_captain_team),
+    name="🛡️ Time Defensor",
+    value="\n".join(player.mention for player in match.defending_team),
         inline=True,
     )
 

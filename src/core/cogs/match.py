@@ -28,7 +28,7 @@ class MatchCog(commands.Cog):
     @app_commands.command(
         name="confirmar-participantes",
         description="Confirmar jogadores para a partida.",
-    )
+    )                                                                                                                                                               
     @app_commands.default_permissions(administrator=True)
     async def confirm_players(self, interaction: discord.Interaction) -> None:
         self.current_match.confirmed_players.clear()
@@ -92,14 +92,17 @@ class MatchCog(commands.Cog):
             )
             return
 
-        (self.current_match.first_captain, self.current_match.second_captain) = (
+        (
+            self.current_match.attacking_captain,
+            self.current_match.defending_captain,
+        ) = (
             random.sample(self.current_match.confirmed_players, 2)
         )
 
         await interaction.response.send_message(
             embed=build_captains_selected_embed(
-                self.current_match.first_captain,
-                self.current_match.second_captain,
+                self.current_match.attacking_captain,
+                self.current_match.defending_captain,
             ),
         )
 
@@ -109,11 +112,11 @@ class MatchCog(commands.Cog):
     )
     async def choose_players(self, interaction: discord.Interaction) -> None:
         """List available players for the match."""
-        self.current_match.setup_team_selection()
+        self.current_match.initialize_teams()
 
         if (
-            not self.current_match.first_captain
-            or not self.current_match.second_captain
+            not self.current_match.attacking_captain
+            or not self.current_match.defending_captain
         ):
             await interaction.response.send_message(
                 "Nenhum capitão foi escolhido ainda.", ephemeral=True
@@ -127,8 +130,8 @@ class MatchCog(commands.Cog):
 
         await interaction.response.send_message(
             embed=build_team_selection_embed(
-                self.current_match.first_captain_team,
-                self.current_match.second_captain_team,
+                self.current_match.attacking_team,
+                self.current_match.defending_team,
             ),
             view=view,
         )

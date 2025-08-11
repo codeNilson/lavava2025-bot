@@ -1,15 +1,14 @@
 import random
-from typing import Optional, override, TYPE_CHECKING
-from discord.ui import View, Select
-import discord
+from typing import Optional, override, Any
 
-if TYPE_CHECKING:
-    from src.core.cogs.match import MatchCog
+import discord
+from discord.ui import View, Select
+
+# UI components for map ban selection
 
 
 class MapSelect(Select):
     def __init__(self):
-
         self.maps = {
             "Haven",
             "Icebox",
@@ -24,24 +23,24 @@ class MapSelect(Select):
             "Ascent",
         }
 
-        options = [discord.SelectOption(label=m, value=m) for m in self.maps]
+        options = [discord.SelectOption(label=m, value=m) for m in sorted(self.maps)]
         super().__init__(
-            placeholder="Escolha uma mapa para **BANIR**",
+            placeholder="Escolha um mapa para BANIR",
             min_values=1,
             max_values=1,
             options=options,
         )
-
+        # Captains' ban choices
         self.captains_choices: dict[str, Optional[str]] = {
             "first_captain_choice": None,
-            "second_captain_choicer": None,
+            "second_captain_choice": None,
         }
 
     @override
     async def callback(self, interaction: discord.Interaction):
         user = interaction.user
-        first_captain = self.view.cog.current_match.first_captain  # type:ignore
-        second_captain = self.view.cog.current_match.second_captain  # type:ignore
+        first_captain = self.view.cog.current_match.attacking_captain  # type: ignore
+        second_captain = self.view.cog.current_match.defending_captain  # type: ignore
 
         if user.id == first_captain.discord_id:
             choice = self.values[0]
@@ -54,7 +53,7 @@ class MapSelect(Select):
 
         elif user.id == second_captain.discord_id:
             choice = self.values[0]
-            self.captains_choices["second_captain_choicer"] = choice
+            self.captains_choices["second_captain_choice"] = choice
             await interaction.response.send_message(
                 f"**{user.name}** escolheu **{choice}** para banir.",
                 delete_after=5,
@@ -63,19 +62,17 @@ class MapSelect(Select):
 
         if (
             self.captains_choices["first_captain_choice"]
-            and self.captains_choices["second_captain_choicer"]
+            and self.captains_choices["second_captain_choice"]
         ):
             first_choice = self.captains_choices["first_captain_choice"]
-            second_choice = self.captains_choices["second_captain_choicer"]
+            second_choice = self.captains_choices["second_captain_choice"]
 
-            map_choose = random.choice(
-                [m for m in self.maps if m not in (first_choice, second_choice)]
-            )
+            remaining = [m for m in self.maps if m not in (first_choice, second_choice)]
+            selected_map = random.choice(remaining)
 
-            self.view.cog.current_match.map_choose = map_choose  # type:ignore
+            self.view.cog.current_match.selected_map = selected_map  # type: ignore
 
             if self.view:
-                print("Stopping view after map selection.")
                 self.view.stop()
 
     @override
@@ -84,25 +81,22 @@ class MapSelect(Select):
     ) -> bool:
         user = interaction.user
 
-        first_captain = self.view.cog.current_match.first_captain  # type:ignore
-        second_captain = self.view.cog.current_match.second_captain  # type:ignore
+        first_captain = self.view.cog.current_match.attacking_captain  # type: ignore
+        second_captain = self.view.cog.current_match.defending_captain  # type: ignore
 
         if user.id not in (first_captain.discord_id, second_captain.discord_id):
             await interaction.response.send_message(
                 "Apenas os capitães podem escolher mapas.",
+                ephemeral=True,
+                delete_after=5,
             )
             return False
         return True
 
 
 class SelectMapView(View):
-    def __init__(
-        self,
-        cog: "MatchCog",
-        message: discord.Message | None = None,
-        timeout=180,
-    ):
+    def __init__(self, cog: Any, message: discord.Message | None = None, timeout: int = 180) -> None:
         super().__init__(timeout=timeout)
-        self.cog: "MatchCog" = cog
-        self.message: discord.Message | None = message
+        self.cog = cog
+        self.message = message
         self.add_item(MapSelect())

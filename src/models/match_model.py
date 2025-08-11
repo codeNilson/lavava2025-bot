@@ -9,33 +9,36 @@ class Match:
     confirmed_players: list[Player] = field(default_factory=list)
     denied_players: list[Player] = field(default_factory=list)
 
-    first_captain: Optional[Player] = None
-    first_captain_team: list[Player] = field(default_factory=list)
+    # Captains and teams
+    attacking_captain: Optional[Player] = None
+    attacking_team: list[Player] = field(default_factory=list)
 
-    second_captain: Optional[Player] = None
-    second_captain_team: list[Player] = field(default_factory=list)
+    defending_captain: Optional[Player] = None
+    defending_team: list[Player] = field(default_factory=list)
 
-    is_first_captain_turn: bool = True
+    # Turn state for drafting (custom order supported)
+    is_attacking_captain_turn: bool = True
 
-    map_choose: Optional[str] = None
+    # Map selected after bans
+    selected_map: Optional[str] = None
 
-    def setup_team_selection(self):
-        """Prepare team selection by clearing teams and adding captains."""
-        self.first_captain_team.clear()
-        self.second_captain_team.clear()
+    def initialize_teams(self) -> None:
+        """Clear teams and add captains as initial team members."""
+        self.attacking_team.clear()
+        self.defending_team.clear()
 
-        if self.first_captain and self.second_captain:
-            self.first_captain_team.append(self.first_captain)
-            self.second_captain_team.append(self.second_captain)
+        if self.attacking_captain and self.defending_captain:
+            self.attacking_team.append(self.attacking_captain)
+            self.defending_team.append(self.defending_captain)
 
-    def reset(self):
-        """Reset all match data."""
+    def reset_match(self) -> None:
+        """Reset all match data to initial state."""
         self.available_players.clear()
         self.confirmed_players.clear()
         self.denied_players.clear()
-        self.first_captain = None
-        self.first_captain_team.clear()
-        self.second_captain = None
-        self.second_captain_team.clear()
-        self.is_first_captain_turn = True
-        self.map_choose = None
+        self.attacking_captain = None
+        self.attacking_team.clear()
+        self.defending_captain = None
+        self.defending_team.clear()
+        self.is_attacking_captain_turn = True
+        self.selected_map = None
