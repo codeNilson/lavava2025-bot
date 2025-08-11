@@ -132,7 +132,7 @@ async def show_matchmacking_result(match: Match) -> discord.Embed:
     map_data = await get_map(match.map_choose)
 
     embed = discord.Embed(
-        title="🏆 Partida Lavava 2025",
+        title=f"🏆 Partida Lavava 2025 - {match.map_choose}",
         description="Partida formada! Boa sorte!",
         color=discord.Color.red(),
     )
@@ -149,6 +149,8 @@ async def show_matchmacking_result(match: Match) -> discord.Embed:
     )
 
     embed.set_image(url=map_data.get("splashUrl"))
+
+    embed.set_thumbnail(url=map_data.get("splashUrl"))
 
     embed.set_footer(text=f"🗺️ Mapa: {map_data.get('name')}")
 
