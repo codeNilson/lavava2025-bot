@@ -1,10 +1,14 @@
 import logging
 from typing import override
+
 import discord
+from discord import app_commands
 from discord.ext import commands
 
+from src.error import ResourceAlreadyExistsError
 
-logger = logging.getLogger("lavava.bot")
+
+logger = logging.getLogger(f"lavava.{__name__}")
 
 GUILD_ID = discord.Object(1372683948554977350)
 
@@ -20,12 +24,15 @@ class LavavaBot(commands.Bot):
     async def on_app_command_error(
         self, interaction: discord.Interaction, error: Exception
     ):
-        if isinstance(error, commands.CommandNotFound):
+        if isinstance(error, app_commands.CommandNotFound):
             await interaction.response.send_message(
                 "Esse comando não existe. Cê é burrão hein?", ephemeral=True
             )
-            logger.debug("User tried to use a non-existent command: %s", interaction.command.name)  # type: ignore
-        elif isinstance(error, commands.MissingPermissions):
+            logger.debug(
+                "User tried to use a non-existent command: %s",
+                interaction.command.name,  # type: ignore
+            )
+        elif isinstance(error, app_commands.MissingPermissions):
             await interaction.response.send_message(
                 "Você não tem permissão para usar este comando.", ephemeral=True
             )
@@ -34,6 +41,15 @@ class LavavaBot(commands.Bot):
                 interaction.user.name,
                 interaction.command.name,  # type: ignore
             )
+        elif isinstance(error, app_commands.CommandInvokeError):
+            original_error = error.original
+
+            if isinstance(original_error, ResourceAlreadyExistsError):
+                await interaction.response.send_message(
+                    "Esse jogador já está registrado.",
+                    ephemeral=True,
+                )
+                logger.debug("ResourceAlreadyExistsError: %s", original_error)
         else:
             await interaction.response.send_message(
                 "Um erro desconhecido ocorreu. Tente novamente mais ou contate um admin.",
@@ -46,14 +62,13 @@ class LavavaBot(commands.Bot):
             logger.info(
                 "Bot is ready. Logged in as %s (ID: %s)", self.user.name, self.user.id
             )
-        else:
-            logger.info("Bot is ready, but user information is not available.")
 
     @override
     async def setup_hook(self):
         await self.load_extension("src.core.cogs.admin")
         await self.load_extension("src.core.cogs.funny")
-        await self.load_extension("src.core.cogs.registration")
+        await self.load_extension("src.core.cogs.player")
+        await self.load_extension("src.core.cogs.match")
         self.tree.copy_global_to(guild=GUILD_ID)
         await self.tree.sync(guild=GUILD_ID)
         # await self.tree.sync()
