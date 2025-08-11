@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Dict, Any, Literal
 import aiohttp
-from ..error.api_errors import ResourceAlreadyExistsError
+from ..error import ResourceAlreadyExistsError
 from ..utils import get_variable
 
 BASE_URL = get_variable("API_BASE_URL")

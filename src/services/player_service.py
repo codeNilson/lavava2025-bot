@@ -3,7 +3,7 @@ import asyncio
 import discord
 
 from ..api import fetch_api
-from ..error.api_errors import ResourceAlreadyExistsError
+from ..error import ResourceAlreadyExistsError
 
 PLAYERS_ENDPOINT = "players"
 

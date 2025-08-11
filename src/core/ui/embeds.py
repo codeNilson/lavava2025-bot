@@ -8,7 +8,7 @@ from src.services.map_service import get_map
 from src.models.player_model import Player
 
 
-def list_players_embed(
+def build_player_confirmation_embed(
     players: list[Player],
     confirmed_players: Optional[list[Player]] = None,
     denied_players: Optional[list[Player]] = None,
@@ -57,7 +57,7 @@ def list_players_embed(
     return embed
 
 
-def captains_choose(
+def build_captains_selected_embed(
     first_captain: Player,
     second_captain: Player,
 ) -> discord.Embed:
@@ -91,7 +91,7 @@ def captains_choose(
     return embed
 
 
-def choose_captains_embed(
+def build_team_selection_embed(
     first_team: list[Player],
     second_team: list[Player],
 ) -> discord.Embed:
@@ -119,7 +119,7 @@ def choose_captains_embed(
     return embed
 
 
-async def show_matchmacking_result(match: Match) -> discord.Embed:
+async def build_match_result_embed(match: Match) -> discord.Embed:
     """Create an embed showing the match details."""
 
     if match.map_choose is None:

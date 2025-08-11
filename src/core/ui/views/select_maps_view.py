@@ -48,8 +48,8 @@ class MapSelect(Select):
             self.captains_choices["first_captain_choice"] = choice
             await interaction.response.send_message(
                 f"**{user.name}** escolheu **{choice}** para banir.",
-                ephemeral=True,
                 delete_after=5,
+                ephemeral=True,
             )
 
         elif user.id == second_captain.discord_id:
@@ -57,8 +57,8 @@ class MapSelect(Select):
             self.captains_choices["second_captain_choicer"] = choice
             await interaction.response.send_message(
                 f"**{user.name}** escolheu **{choice}** para banir.",
-                ephemeral=True,
                 delete_after=5,
+                ephemeral=True,
             )
 
         if (
@@ -73,10 +73,6 @@ class MapSelect(Select):
             )
 
             self.view.cog.current_match.map_choose = map_choose  # type:ignore
-
-            await interaction.followup.send(
-                f"Os mapas banidos foram: **{first_choice}** e **{second_choice}**."
-            )
 
             if self.view:
                 print("Stopping view after map selection.")

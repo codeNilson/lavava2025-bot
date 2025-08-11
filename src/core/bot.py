@@ -5,7 +5,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from src.error.api_errors import ResourceAlreadyExistsError
+from src.error import ResourceAlreadyExistsError
 
 
 logger = logging.getLogger(f"lavava.{__name__}")

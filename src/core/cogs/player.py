@@ -1,5 +1,5 @@
 import logging
-from typing import Union, Optional
+from typing import Union
 
 import discord
 from discord import app_commands

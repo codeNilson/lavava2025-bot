@@ -8,10 +8,10 @@ from src.core.ui.views.select_maps_view import SelectMapView
 from src.models.match_model import Match
 from src.models.player_model import Player
 from src.core.ui.embeds import (
-    captains_choose,
-    choose_captains_embed,
-    list_players_embed,
-    show_matchmacking_result,
+    build_captains_selected_embed,
+    build_team_selection_embed,
+    build_player_confirmation_embed,
+    build_match_result_embed,
 )
 from src.core.ui.views import ConfirmParticipationView
 from src.core.ui.views.players_buttons_view import PlayersButtonsView
@@ -42,7 +42,7 @@ class MatchCog(commands.Cog):
         )
 
         await interaction.response.send_message(
-            embed=list_players_embed(self.current_match.available_players),
+            embed=build_player_confirmation_embed(self.current_match.available_players),
             view=confirmation_view,
         )
 
@@ -54,7 +54,7 @@ class MatchCog(commands.Cog):
             return
 
         await interaction.followup.send(
-            "A partida foi iniciada com os jogadores confirmados."
+            "Etapa de confirmação encerrada. Hora de sortear os capitães!"
         )
 
     async def _load_all_players(self, interaction: discord.Interaction) -> bool:
@@ -97,7 +97,7 @@ class MatchCog(commands.Cog):
         )
 
         await interaction.response.send_message(
-            embed=captains_choose(
+            embed=build_captains_selected_embed(
                 self.current_match.first_captain,
                 self.current_match.second_captain,
             ),
@@ -126,7 +126,7 @@ class MatchCog(commands.Cog):
             await view.add_player_button(player)
 
         await interaction.response.send_message(
-            embed=choose_captains_embed(
+            embed=build_team_selection_embed(
                 self.current_match.first_captain_team,
                 self.current_match.second_captain_team,
             ),
@@ -143,7 +143,7 @@ class MatchCog(commands.Cog):
             )
 
         await interaction.followup.send(
-            "As equipes foram formadas. Hora de escolherem o bans de mapa!",
+            "As equipes foram formadas! Capitães, hora de escolherem o bans de mapa!",
         )
 
     @match_making.command(
@@ -169,7 +169,7 @@ class MatchCog(commands.Cog):
             return
 
         await message.edit(
-            embed=await show_matchmacking_result(self.current_match),
+            embed=await build_match_result_embed(self.current_match),
             view=None,
         )
 

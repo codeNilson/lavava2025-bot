@@ -3,7 +3,7 @@ from typing import Optional, TYPE_CHECKING
 import discord
 from discord.utils import find
 from src.models.player_model import Player
-from ..embeds import list_players_embed
+from ..embeds import build_player_confirmation_embed
 
 if TYPE_CHECKING:
     from src.core.cogs.match import MatchCog
@@ -68,7 +68,7 @@ class ConfirmParticipationView(discord.ui.View):
         # Adiciona à lista de confirmados
         self.cog.current_match.confirmed_players.append(user_player)
 
-        updated_embed = list_players_embed(
+        updated_embed = build_player_confirmation_embed(
             self.available_players,
             self.cog.current_match.confirmed_players,
             self.cog.current_match.denied_players,
@@ -110,7 +110,7 @@ class ConfirmParticipationView(discord.ui.View):
         # Adiciona à lista de negados
         self.cog.current_match.denied_players.append(user_player)
 
-        updated_embed = list_players_embed(
+        updated_embed = build_player_confirmation_embed(
             self.available_players,
             self.cog.current_match.confirmed_players,
             self.cog.current_match.denied_players,
@@ -139,10 +139,7 @@ class ConfirmParticipationView(discord.ui.View):
             )
             return
 
-        await interaction.response.send_message(
-            "🚀 Partida iniciada! Preparando os times...",
-            ephemeral=True,
-        )
+        await interaction.response.defer()
 
         self.stop()
 

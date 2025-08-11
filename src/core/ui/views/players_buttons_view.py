@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from src.core.ui.embeds import choose_captains_embed
+from src.core.ui.embeds import build_team_selection_embed
 from src.models.player_model import Player
 
 if TYPE_CHECKING:
@@ -121,7 +121,7 @@ class PlayersButtonsView(discord.ui.View):
                 self.stop()
 
             await interaction.response.edit_message(
-                embed=choose_captains_embed(
+                embed=build_team_selection_embed(
                     self.cog.current_match.first_captain_team,
                     self.cog.current_match.second_captain_team,
                 ),
