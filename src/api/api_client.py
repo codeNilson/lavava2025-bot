@@ -18,7 +18,8 @@ async def fetch_api(
     data: Optional[Dict[str, Any]] = None,
 ):
 
-    url = BASE_URL + endpoint.replace("/", "")
+    url = BASE_URL + endpoint
+    url = url.replace("//", "/").replace(":/", "://")
     auth = aiohttp.BasicAuth(LOGIN, PASSWORD)
 
     try:

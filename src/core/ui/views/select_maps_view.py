@@ -79,6 +79,7 @@ class MapSelect(Select):
             )
 
             if self.view:
+                print("Stopping view after map selection.")
                 self.view.stop()
 
     @override

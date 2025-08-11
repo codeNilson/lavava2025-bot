@@ -11,6 +11,7 @@ from src.core.ui.embeds import (
     captains_choose,
     choose_captains_embed,
     list_players_embed,
+    show_matchmacking_result,
 )
 from src.core.ui.views import ConfirmParticipationView
 from src.core.ui.views.players_buttons_view import PlayersButtonsView
@@ -157,13 +158,20 @@ class MatchCog(commands.Cog):
             view=view,
         )
 
-        view.message = await interaction.original_response()
+        message = await interaction.original_response()
+
+        view.message = message
 
         timed_out: bool = await view.wait()
 
         if timed_out:
             await interaction.followup.send("O tempo para escolher os mapas acabou.")
             return
+
+        await message.edit(
+            embed=await show_matchmacking_result(self.current_match),
+            view=None,
+        )
 
 
 async def setup(bot: commands.Bot):

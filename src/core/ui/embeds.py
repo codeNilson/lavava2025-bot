@@ -1,6 +1,10 @@
 from typing import Optional
 import math
+
 import discord
+
+from src.models.match_model import Match
+from src.services.map_service import get_map
 from src.models.player_model import Player
 
 
@@ -111,5 +115,41 @@ def choose_captains_embed(
     )
 
     embed.set_footer(text="💡 Lembrete: o segundo capitão escolhe o 6º e o 7º pick.")
+
+    return embed
+
+
+async def show_matchmacking_result(match: Match) -> discord.Embed:
+    """Create an embed showing the match details."""
+
+    if match.map_choose is None:
+        return discord.Embed(
+            title="⚠️ Erro",
+            description="Nenhum mapa foi escolhido para a partida.",
+            color=discord.Color.red(),
+        )
+
+    map_data = await get_map(match.map_choose)
+
+    embed = discord.Embed(
+        title="🏆 Partida Lavava 2025",
+        description="Partida formada! Boa sorte!",
+        color=discord.Color.red(),
+    )
+
+    embed.add_field(
+        name="🗡️ Time Atacante",
+        value="\n".join(player.mention for player in match.first_captain_team),
+        inline=True,
+    )
+    embed.add_field(
+        name="🛡️ Time Defensor",
+        value="\n".join(player.mention for player in match.second_captain_team),
+        inline=True,
+    )
+
+    embed.set_image(url=map_data.get("splashUrl"))
+
+    embed.set_footer(text=f"🗺️ Mapa: {map_data.get('name')}")
 
     return embed
