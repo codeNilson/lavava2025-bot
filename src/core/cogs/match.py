@@ -41,7 +41,7 @@ class MatchCog(commands.Cog):
     @match_making.command(
         name="check-in",
         description="Confirma jogadores que desejam participar da partida.",
-    )                                                                                                                                                               
+    )
     @app_commands.default_permissions(administrator=True)
     async def confirm_players(self, interaction: discord.Interaction) -> None:
         """List all registred players and start the confirmation process"""
@@ -122,9 +122,7 @@ class MatchCog(commands.Cog):
         (
             self.current_match.attacking_captain,
             self.current_match.defending_captain,
-        ) = (
-            random.sample(self.current_match.confirmed_players, 2)
-        )
+        ) = random.sample(self.current_match.confirmed_players, 2)
 
         await interaction.response.send_message(
             embed=build_captains_selected_embed(
@@ -173,7 +171,7 @@ class MatchCog(commands.Cog):
             )
 
         await interaction.followup.send(
-            "As equipes foram formadas! Capitães, hora de escolherem o bans de mapa!",
+            "As equipes foram formadas! Capitães, hora de escolherem os **bans** de mapa!",
         )
 
     @match_making.command(
