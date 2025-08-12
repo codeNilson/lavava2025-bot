@@ -21,68 +21,95 @@ logger = logging.getLogger("lavava.cog.match")
 
 
 class MatchCog(commands.Cog):
+    """
+    Fluxo:
+    /arena check-in → /arena capitães → /arena draft → /arena mapas
+    """
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.current_match = Match()
 
-    @app_commands.command(
-        name="confirmar-participantes",
-        description="Confirmar jogadores para a partida.",
+    # Create a group of commands for the match cog
+    match_making = app_commands.Group(
+        name="arena",
+        description="Comandos para preparação da partida.",
+        guild_only=True,
+        default_permissions=discord.Permissions(administrator=True),
+    )
+
+    @match_making.command(
+        name="check-in",
+        description="Confirma jogadores que desejam participar da partida.",
     )                                                                                                                                                               
     @app_commands.default_permissions(administrator=True)
     async def confirm_players(self, interaction: discord.Interaction) -> None:
-        self.current_match.confirmed_players.clear()
+        """List all registred players and start the confirmation process"""
 
+        # Clear current match data
+        self.current_match.reset_match()
+
+        # Call function to load all players from the database
         players_loaded: bool = await self._load_all_players(interaction)
         if not players_loaded:
             return
 
+        # Create the view for confirmation
         confirmation_view = ConfirmParticipationView(
             self.current_match.available_players, cog=self
         )
 
+        # Respond the interaction with the confirmation embed and the view
         await interaction.response.send_message(
             embed=build_player_confirmation_embed(self.current_match.available_players),
             view=confirmation_view,
         )
 
+        # Get the message that was sent to the user and set it to the view
+        # so it can be edited later
         message: discord.InteractionMessage = await interaction.original_response()
         confirmation_view.message = message
 
+        # Wait the interaction to be confirmed or timed out
         timed_out = await confirmation_view.wait()
         if timed_out:
+            self.current_match.reset_match()  # reseta estado
+            await interaction.followup.send(
+                "Tempo para confirmação encerrado. Operação cancelada.",
+                ephemeral=True,
+            )
             return
 
+        # Send a message to the user with the confirmed players
         await interaction.followup.send(
             "Etapa de confirmação encerrada. Hora de sortear os capitães!"
         )
 
     async def _load_all_players(self, interaction: discord.Interaction) -> bool:
         """Load all players from the database."""
+
+        # fetch players from backend
         players_data = await get_all_players()
 
+        # check if there are enough players to start a match
+        # if not, send a message to the user and return False
         if len(players_data) < 10:
             await interaction.response.send_message(
                 "Não há jogadores suficientes para iniciar uma partida.",
+                ephemeral=True,
                 delete_after=10,
             )
             return False
 
+        # set the available players to the players loaded from the database
         self.current_match.available_players = [
             Player(**player) for player in players_data
         ]
         return True
 
-    match_making = app_commands.Group(
-        name="escolher",
-        description="Comandos para escolher capitães e jogadores.",
-        guild_only=True,
-        default_permissions=discord.Permissions(administrator=True),
-    )
-
     @match_making.command(
         name="capitães",
-        description="Sortear capitães para a partida.",
+        description="Sortea capitães para a partida.",
     )
     async def choose_captains(self, interaction: discord.Interaction):
         if len(self.current_match.confirmed_players) < 2:
@@ -107,8 +134,8 @@ class MatchCog(commands.Cog):
         )
 
     @match_making.command(
-        name="jogadores",
-        description="iniciar a escolha de jogadores para a partida.",
+        name="draft",
+        description="inicia a escolha de jogadores para a partida.",
     )
     async def choose_players(self, interaction: discord.Interaction) -> None:
         """List available players for the match."""
@@ -151,7 +178,7 @@ class MatchCog(commands.Cog):
 
     @match_making.command(
         name="mapas",
-        description="iniciar a escolha de jogadores para a partida.",
+        description="Inicia o banimento de mapas para a partida.",
     )
     async def choose_maps(self, interaction: discord.Interaction) -> None:
 
