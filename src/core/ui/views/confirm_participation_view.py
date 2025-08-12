@@ -127,6 +127,14 @@ class ConfirmParticipationView(discord.ui.View):
     ) -> None:
         """Handle the start match button click."""
 
+        if len(self.cog.current_match.confirmed_players) < 2:
+            await interaction.response.send_message(
+                "É necessário pelo menos 2 jogadores confirmados para iniciar a partida.",
+                ephemeral=True,
+                delete_after=5,
+            )
+            return
+
         # Cast para Member
         member = interaction.user
         assert isinstance(member, discord.Member)
@@ -139,8 +147,14 @@ class ConfirmParticipationView(discord.ui.View):
             )
             return
 
-        await interaction.response.defer()
+        for button in self.children:
+            if isinstance(button, discord.ui.Button):
+                button.disabled = True
 
+        # Edit the message that contains this view to persist disabled state
+        await interaction.response.edit_message(view=self)
+
+        # Stop the view to prevent further interactions
         self.stop()
 
     async def on_timeout(self) -> None:

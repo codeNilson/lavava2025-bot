@@ -21,6 +21,8 @@ class PlayersButtonsView(discord.ui.View):
         for child in self.children:
             if isinstance(child, discord.ui.Button):
                 child.disabled = True
+        if self.message:
+            await self.message.edit(view=self)
 
     async def add_player_button(self, player: Player):
         """Add a button for a player."""
@@ -51,7 +53,7 @@ class PlayersButtonsView(discord.ui.View):
                 )
                 return
 
-            # Total de picks realizados (excluindo os próprios capitães que já estão nas listas)
+            # Total picks made (excluding the captains already present in the team lists)
             picks_made = (
                 len(self.cog.current_match.attacking_team)
                 - 1
@@ -59,7 +61,7 @@ class PlayersButtonsView(discord.ui.View):
                 - 1
             )
 
-            # Ordem personalizada: F: 1,3,5,8 | S: 2,4,6,7
+            # Custom pick order: First captain at picks 1,3,5,8 | Second captain at picks 2,4,6,7
             pick_index = picks_made + 1  # 1-based
             first_turn_indices = {1, 3, 5, 8}
             is_first_turn_now = pick_index in first_turn_indices
@@ -71,9 +73,9 @@ class PlayersButtonsView(discord.ui.View):
                 first_captain if is_first_turn_now else second_captain
             )
 
-            # Bloqueia a inteRação de quem não é o capitão da vez
+            # Block interaction from users who are not the current-turn captain
             if interaction.user.id != current_turn_captain.discord_id:
-                # Se for capitao, mas fora de turno
+                # If user is a captain but it's not their turn
                 if interaction.user.id in (
                     first_captain.discord_id,
                     second_captain.discord_id,
@@ -84,7 +86,7 @@ class PlayersButtonsView(discord.ui.View):
                         delete_after=5,
                     )
                     return
-                # Se não for capitao
+                # If user is not a captain
                 await interaction.response.send_message(
                     "Apenas capitães podem escolher jogadores.",
                     ephemeral=True,
@@ -92,13 +94,13 @@ class PlayersButtonsView(discord.ui.View):
                 )
                 return
 
-            # Aplica a escolha ao time correto
+            # Apply the pick to the correct team
             if is_first_turn_now:
                 self.cog.current_match.attacking_team.append(player)
             else:
                 self.cog.current_match.defending_team.append(player)
 
-            # Atualiza a flag de turno para refletir o próximo pick, mantendo compatibilidade
+            # Update the turn flag to reflect the next pick, keeping compatibility
             new_picks_made = picks_made + 1
             next_pick_index = new_picks_made + 1
             self.cog.current_match.is_attacking_captain_turn = (
@@ -112,7 +114,7 @@ class PlayersButtonsView(discord.ui.View):
                     button.disabled = True
                     button.style = discord.ButtonStyle.secondary
 
-            # Se chegamos ao último pick, desabilita todos os botões
+            # If we've reached the last pick, disable all buttons
             if new_picks_made >= 8:
                 for button in self.children:
                     if isinstance(button, discord.ui.Button):
