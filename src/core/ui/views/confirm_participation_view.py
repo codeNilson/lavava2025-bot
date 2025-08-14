@@ -68,7 +68,7 @@ class ConfirmParticipationView(discord.ui.View):
         # Adiciona à lista de confirmados
         self.cog.current_match.confirmed_players.append(user_player)
 
-        updated_embed = build_player_confirmation_embed(
+        updated_embed: discord.Embed = build_player_confirmation_embed(
             self.available_players,
             self.cog.current_match.confirmed_players,
             self.cog.current_match.denied_players,
@@ -89,7 +89,7 @@ class ConfirmParticipationView(discord.ui.View):
         user_id = interaction.user.id
 
         # Encontra o jogador na lista disponível
-        user_player = self._find_player_in_available(user_id)
+        user_player: Player | None = self._find_player_in_available(user_id)
         if not user_player:
             await interaction.response.send_message(
                 "❌ Você não está na lista de jogadores disponíveis.",
@@ -136,7 +136,7 @@ class ConfirmParticipationView(discord.ui.View):
             return
 
         # Cast para Member
-        member = interaction.user
+        member: discord.User | discord.Member = interaction.user
         assert isinstance(member, discord.Member)
 
         if not member.guild_permissions.administrator:
