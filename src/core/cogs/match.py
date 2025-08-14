@@ -4,6 +4,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from src.models.match_response_model import MatchResponse
+from src.services.team_service import create_team
+from src.services.match_service import create_match
 from src.core.ui.views.select_maps_view import SelectMapView
 from src.models.match_model import Match
 from src.models.player_model import Player
@@ -199,6 +202,51 @@ class MatchCog(commands.Cog):
         await message.edit(
             embed=await build_match_result_embed(self.current_match),
             view=None,
+        )
+
+    @match_making.command(
+        name="start",
+        description="Inicia a partida com as equipes e mapas selecionados.",
+    )
+    async def start_match(self, interaction: discord.Interaction) -> None:
+
+        if self._teams_not_full() or not self.current_match.selected_map:
+            print(
+                self._teams_not_full(),
+                self.current_match.selected_map,
+            )
+            await interaction.response.send_message(
+                "As equipes não estão completas ou o mapa não foi selecionado.",
+                ephemeral=True,
+            )
+            return
+
+        await interaction.response.defer(thinking=True)
+
+        match_info: MatchResponse = await create_match(self.current_match)
+
+        await create_team(
+            match_info.id,
+            self.current_match.attacking_team,
+        )
+
+        logger.info("Attacking team created for match %s", match_info.id)
+
+        await create_team(
+            match_info.id,
+            self.current_match.defending_team,
+        )
+
+        logger.info("Defending team created for match %s", match_info.id)
+
+        await interaction.followup.send(
+            "Partida iniciada com sucesso! Boa sorte a todos os jogadores!",
+        )
+
+    def _teams_not_full(self) -> bool:
+        return (
+            len(self.current_match.attacking_team) < 5
+            or len(self.current_match.defending_team) < 5
         )
 
 

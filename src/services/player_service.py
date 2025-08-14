@@ -1,9 +1,8 @@
 import logging
-import asyncio
 import discord
 
-from ..api import fetch_api
-from ..error import ResourceAlreadyExistsError
+from src.api import fetch_api
+from src.error import ResourceAlreadyExistsError
 
 PLAYERS_ENDPOINT = "players"
 
@@ -49,8 +48,3 @@ async def deactivate_player(player: discord.Member, reason: str):
             "reason": reason,
         },
     )
-
-
-if __name__ == "__main__":
-    response = asyncio.run(get_all_players())
-    print(response)

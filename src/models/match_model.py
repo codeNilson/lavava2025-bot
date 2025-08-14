@@ -1,10 +1,12 @@
 from dataclasses import dataclass, field
 from typing import Optional
+from uuid import UUID
 from src.models.player_model import Player
 
 
 @dataclass
 class Match:
+
     available_players: list[Player] = field(default_factory=list)
     confirmed_players: list[Player] = field(default_factory=list)
     denied_players: list[Player] = field(default_factory=list)
@@ -33,6 +35,7 @@ class Match:
 
     def reset_match(self) -> None:
         """Reset all match data to initial state."""
+        self.match_id = None
         self.available_players.clear()
         self.confirmed_players.clear()
         self.denied_players.clear()
