@@ -2,8 +2,8 @@ import logging
 from typing import Optional, TYPE_CHECKING
 import discord
 from discord.utils import find
+from src.core.ui.embeds import build_player_confirmation_embed
 from src.models.player_model import Player
-from ..embeds import build_player_confirmation_embed
 
 if TYPE_CHECKING:
     from src.core.cogs.match import MatchCog
