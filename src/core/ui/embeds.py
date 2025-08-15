@@ -132,19 +132,19 @@ async def build_match_result_embed(match: Match) -> discord.Embed:
     map_data = await get_map(match.selected_map)
 
     embed = discord.Embed(
-    title=f"🏆 Partida Lavava 2025 - {match.selected_map}",
+        title=f"🏆 Partida Lavava 2025 - {match.selected_map}",
         description="Partida formada! Boa sorte!",
         color=discord.Color.red(),
     )
 
     embed.add_field(
-    name="🗡️ Time Atacante",
-    value="\n".join(player.mention for player in match.attacking_team),
+        name="🗡️ Time Atacante",
+        value="\n".join(player.mention for player in match.attacking_team),
         inline=True,
     )
     embed.add_field(
-    name="🛡️ Time Defensor",
-    value="\n".join(player.mention for player in match.defending_team),
+        name="🛡️ Time Defensor",
+        value="\n".join(player.mention for player in match.defending_team),
         inline=True,
     )
 

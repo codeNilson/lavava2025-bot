@@ -169,9 +169,7 @@ class MatchCog(commands.Cog):
 
         timed_out: bool = await view.wait()
         if timed_out:
-            await interaction.followup.send(
-                "O tempo para escolher os jogadores acabou."
-            )
+            return
 
         await interaction.followup.send(
             "As equipes foram formadas! Capitães, hora de escolherem os **bans** de mapa!",
@@ -196,7 +194,6 @@ class MatchCog(commands.Cog):
         timed_out: bool = await view.wait()
 
         if timed_out:
-            await interaction.followup.send("O tempo para escolher os mapas acabou.")
             return
 
         await message.edit(

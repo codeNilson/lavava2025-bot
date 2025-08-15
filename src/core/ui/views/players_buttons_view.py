@@ -13,16 +13,23 @@ class PlayersButtonsView(discord.ui.View):
     """View for player buttons in the match context."""
 
     def __init__(self, cog: "MatchCog", timeout=180):
-        super().__init__(timeout=timeout)
+        super().__init__(timeout=5)
         self.cog = cog
         self.message: discord.Message | None = None
 
     async def on_timeout(self):
-        for child in self.children:
-            if isinstance(child, discord.ui.Button):
-                child.disabled = True
+        # for child in self.children:
+        #     if isinstance(child, discord.ui.Button):
+        #         child.disabled = True
         if self.message:
-            await self.message.edit(view=self)
+
+            timeout_embed = discord.Embed(
+                title="⏰ Tempo Esgotado",
+                description="O tempo para escolher os jogadores expirou.",
+                color=discord.Color.orange(),
+            )
+
+            await self.message.edit(embed=timeout_embed, view=None)
 
     async def add_player_button(self, player: Player):
         """Add a button for a player."""
