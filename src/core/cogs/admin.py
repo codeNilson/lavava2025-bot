@@ -1,5 +1,4 @@
 import logging
-from typing import Optional, Union
 
 import discord
 from discord.ext import commands
@@ -19,7 +18,11 @@ class AdminCog(commands.Cog):
     )
     @app_commands.default_permissions(administrator=True)
     async def ping(self, interaction: discord.Interaction):
-        await interaction.response.send_message("Pong!")
+        await interaction.response.send_message(
+            "Pong!",
+            ephemeral=True,
+            delete_after=5,
+        )
 
     @app_commands.command(
         name="registrar-jogador",

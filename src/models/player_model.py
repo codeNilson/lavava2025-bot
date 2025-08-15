@@ -5,10 +5,12 @@ class Player:
     def __init__(
         self,
         username: str,
+        id: str,
         *args,
         discordId: Optional[int] = None,
         **kwargs,
     ) -> None:
+        self.id: str = id
         self.username: str = username
         self.discord_id: Optional[int] = discordId
 
