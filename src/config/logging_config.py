@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from logging import Formatter
-from ..utils import get_variable
+from src.utils import get_variable
 
 
 def get_log_level() -> str:
@@ -18,8 +18,9 @@ def setup_root_logger():
     # Root Logger
     logger = logging.getLogger()
 
+    # Discord.py style formatter: YYYY-MM-DD HH:MM:SS LEVEL    logger_name Message
     formatter = Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "%(asctime)s %(levelname)-8s %(name)s %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
