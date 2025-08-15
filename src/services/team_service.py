@@ -9,19 +9,9 @@ TEAMS_ENDPOINT = "teams"
 logger = logging.getLogger("lavava.services.match_service")
 
 
-async def create_team(match_id: str, players_ids: List[Player]):
-    # Filter out players without a discord_id and log them for debugging
-    players_with_ids = [p for p in players_ids if getattr(p, "id", None) is not None]
-    missing = [p for p in players_ids if getattr(p, "id", None) is None]
+async def create_team(match_id: str, players: List[Player]):
 
-    if missing:
-        logger.warning(
-            "Some players are missing id for match %s: %s",
-            match_id,
-            [str(p) for p in missing],
-        )
-
-    players_id_list = [player.id for player in players_with_ids]
+    players_id_list = [player.id for player in players]
 
     await fetch_api(
         TEAMS_ENDPOINT,
