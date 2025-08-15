@@ -7,7 +7,11 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 
 from src.error.api_errors import ResourceNotFound
-from src.services.player_service import deactivate_player, register_new_player
+from src.services.player_service import (
+    active_player,
+    deactivate_player,
+    register_new_player,
+)
 
 logger = logging.getLogger(f"lavava.cog.{__name__}")
 
@@ -67,6 +71,63 @@ class PlayerCog(commands.Cog):
             f"✅ Registro concluído com sucesso! Seja bem-vindo, {member.name}!",
             ephemeral=True,
         )
+
+    @app_commands.command(
+        name="desativar",
+        description="Desativar jogador",
+    )
+    @app_commands.describe(
+        member="Membro do servidor para desativar",
+        reason="Motivo da desativação",
+    )
+    async def deactivate(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        reason: str = "Nenhum motivo fornecido",
+    ) -> None:
+        """Deactivate a player."""
+
+        await deactivate_player(member, reason)
+
+        await interaction.response.send_message(
+            f"✅ Jogador {member.name} desativado com sucesso!",
+            ephemeral=True,
+        )
+
+    @app_commands.command(
+        name="reativar",
+        description="Reativar jogador",
+    )
+    @app_commands.describe(member="Membro do servidor para reativar")
+    async def reactivate(
+        self, interaction: discord.Interaction, member: discord.Member
+    ) -> None:
+        """Reactivate a player."""
+
+        try:
+            await active_player(member)
+            await interaction.response.send_message(
+                f"✅ Jogador {member.name} reativado com sucesso!",
+                ephemeral=True,
+            )
+        except ResourceNotFound:
+            await interaction.response.send_message(
+                f"❌ Jogador {member.name} não encontrado no sistema.",
+                ephemeral=True,
+            )
+            logger.warning(
+                "Attempted to reactivate player %s (ID: %s), but they were not found in the system.",
+                member.name,
+                member.id,
+            )
+        except Exception as e:
+            logger.error(
+                "Failed to reactivate player %s (ID: %s): %s",
+                member.name,
+                member.id,
+                str(e),
+            )
 
 
 async def setup(bot: commands.Bot):
