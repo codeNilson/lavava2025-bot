@@ -6,7 +6,8 @@ from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Bot
 
-from ...services.player_service import register_new_player
+from src.error.api_errors import ResourceNotFound
+from src.services.player_service import deactivate_player, register_new_player
 
 logger = logging.getLogger(f"lavava.cog.{__name__}")
 
@@ -28,10 +29,27 @@ class PlayerCog(commands.Cog):
         self, _: discord.Guild, member: Union[discord.Member, discord.User]
     ):
         """Handle member ban."""
-        if isinstance(member, discord.Member):
-            ban_entry = await member.guild.fetch_ban(member)
-            ban_reason = ban_entry.reason if ban_entry.reason else "No reason provided"
-            print(f"{member.name} was banned. Reason: {ban_reason}")
+        if not isinstance(member, discord.Member):
+            return
+        ban_entry = await member.guild.fetch_ban(member)
+        ban_reason = ban_entry.reason if ban_entry.reason else "No reason provided"
+
+        try:
+            await deactivate_player(member, ban_reason)
+        except ResourceNotFound:
+            logger.warning(
+                "Player %s (ID: %s) not found in the system. Skipping deactivation.",
+                member.name,
+                member.id,
+            )
+            return
+
+        logger.info(
+            "Member %s (ID: %s) banned. Deactivated player with reason: %s",
+            member.name,
+            member.id,
+            ban_reason,
+        )
 
     @app_commands.command(
         name="registrar",

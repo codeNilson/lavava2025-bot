@@ -96,7 +96,7 @@ class MatchCog(commands.Cog):
 
         # check if there are enough players to start a match
         # if not, send a message to the user and return False
-        if len(players_data) < 10:
+        if not players_data or len(players_data) < 10:
             await interaction.response.send_message(
                 "Não há jogadores suficientes para iniciar uma partida.",
                 ephemeral=True,

@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 class PlayersButtonsView(discord.ui.View):
     """View for player buttons in the match context."""
 
-    def __init__(self, cog: "MatchCog", timeout=180):
-        super().__init__(timeout=5)
+    def __init__(self, cog: "MatchCog", timeout=120):
+        super().__init__(timeout=timeout)
         self.cog = cog
         self.message: discord.Message | None = None
 

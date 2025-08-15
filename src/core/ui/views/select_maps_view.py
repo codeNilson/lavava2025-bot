@@ -98,7 +98,7 @@ class SelectMapView(View):
     def __init__(
         self, cog: Any, message: discord.Message | None = None, timeout: int = 180
     ) -> None:
-        super().__init__(timeout=5)
+        super().__init__(timeout=120)
         self.cog = cog
         self.message = message
         self.add_item(MapSelect())
@@ -106,7 +106,7 @@ class SelectMapView(View):
     async def on_timeout(self) -> None:
         if not self.message:
             return
-        
+
         timeout_embed = discord.Embed(
             title="⏰ Tempo Esgotado",
             description="O tempo para escolher os mapas banidos expirou.",

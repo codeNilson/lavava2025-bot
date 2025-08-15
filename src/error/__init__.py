@@ -1,1 +1,1 @@
-from .api_errors import ResourceAlreadyExistsError
+from .api_errors import ResourceAlreadyExistsError, ResourceNotFound

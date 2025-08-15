@@ -11,7 +11,7 @@ async def get_map(name: str) -> dict:
     try:
         map_data = await fetch_api(f"/maps/{name}")
         logger.info("Successfully retrieved map data for %s", name)
-        return map_data
+        return map_data # type: ignore
     except Exception as e:
         logger.error("Failed to fetch map %s: %s", name, str(e))
         raise
