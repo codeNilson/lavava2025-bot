@@ -211,10 +211,6 @@ class MatchCog(commands.Cog):
     async def start_match(self, interaction: discord.Interaction) -> None:
 
         if self._teams_not_full() or not self.current_match.selected_map:
-            print(
-                self._teams_not_full(),
-                self.current_match.selected_map,
-            )
             await interaction.response.send_message(
                 "As equipes não estão completas ou o mapa não foi selecionado.",
                 ephemeral=True,
