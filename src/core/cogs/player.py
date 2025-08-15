@@ -105,29 +105,11 @@ class PlayerCog(commands.Cog):
     ) -> None:
         """Reactivate a player."""
 
-        try:
-            await active_player(member)
-            await interaction.response.send_message(
-                f"✅ Jogador {member.name} reativado com sucesso!",
-                ephemeral=True,
-            )
-        except ResourceNotFound:
-            await interaction.response.send_message(
-                f"❌ Jogador {member.name} não encontrado no sistema.",
-                ephemeral=True,
-            )
-            logger.warning(
-                "Attempted to reactivate player %s (ID: %s), but they were not found in the system.",
-                member.name,
-                member.id,
-            )
-        except Exception as e:
-            logger.error(
-                "Failed to reactivate player %s (ID: %s): %s",
-                member.name,
-                member.id,
-                str(e),
-            )
+        await active_player(member)
+        await interaction.response.send_message(
+            f"✅ Jogador {member.name} reativado com sucesso!",
+            ephemeral=True,
+        )
 
 
 async def setup(bot: commands.Bot):

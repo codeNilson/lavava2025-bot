@@ -11,6 +11,7 @@ logger = logging.getLogger("lavava.services.player_service")
 
 # === Utility Functions ===
 
+
 def _get_jogador_role(guild: discord.Guild) -> discord.Role:
     """Get the 'Jogador' role from the guild."""
     jogador_role = discord.utils.get(guild.roles, name="Jogador")
@@ -23,7 +24,7 @@ def _get_jogador_role(guild: discord.Guild) -> discord.Role:
 async def _ensure_player_has_role(player: discord.Member, reason: str) -> None:
     """Ensure player has the 'Jogador' role."""
     jogador_role = _get_jogador_role(player.guild)
-    
+
     if jogador_role not in player.roles:
         await player.add_roles(jogador_role, reason=reason)
         logger.info("Player %s assigned 'Jogador' role", player.name)
@@ -34,7 +35,7 @@ async def _ensure_player_has_role(player: discord.Member, reason: str) -> None:
 async def _remove_player_role(player: discord.Member, reason: str) -> None:
     """Remove the 'Jogador' role from player."""
     jogador_role = _get_jogador_role(player.guild)
-    
+
     if jogador_role in player.roles:
         await player.remove_roles(jogador_role, reason=reason)
         logger.info("Player %s 'Jogador' role removed", player.name)
@@ -43,6 +44,7 @@ async def _remove_player_role(player: discord.Member, reason: str) -> None:
 
 
 # === API Functions ===
+
 
 async def _register_player_api(player: discord.Member) -> None:
     """Register player in the API."""
@@ -74,6 +76,7 @@ async def _activate_player_api(username: str) -> None:
 
 # === Public Functions ===
 
+
 async def get_all_players():
     """Fetch all players from the API."""
     logger.info("Fetching all players from API")
@@ -84,7 +87,6 @@ async def get_all_players():
         return players_data
     except Exception as e:
         logger.error("Failed to fetch players: %s", str(e))
-        raise
 
 
 async def register_new_player(player: discord.Member):
@@ -95,12 +97,9 @@ async def register_new_player(player: discord.Member):
         # Try to register player in API
         await _register_player_api(player)
         logger.info("Player %s registered successfully in API", player.name)
-        
+
         # Ensure player has the role
-        await _ensure_player_has_role(
-            player, 
-            "Player registered via bot command"
-        )
+        await _ensure_player_has_role(player, "Player registered via bot command")
 
     except ResourceAlreadyExistsError:
         logger.warning(
@@ -108,53 +107,48 @@ async def register_new_player(player: discord.Member):
             player.name,
             player.id,
         )
-        
+
         # Player already exists - try to reactivate in case they're deactivated
         try:
             await _activate_player_api(player.name)
-            logger.info("Player %s was deactivated and has been reactivated", player.name)
-            
+            logger.info(
+                "Player %s was deactivated and has been reactivated", player.name
+            )
+
             # Ensure player has the role after reactivation
             await _ensure_player_has_role(
-                player,
-                "Player reactivated via registration attempt"
+                player, "Player reactivated via registration attempt"
             )
-            
+
         except (ResourceAlreadyExistsError, RuntimeError) as reactivate_error:
             logger.debug(
                 "Could not reactivate player %s (they might be already active): %s",
                 player.name,
-                str(reactivate_error)
+                str(reactivate_error),
             )
-            
+
             # Even if reactivation fails, ensure they have the role
             await _ensure_player_has_role(
-                player,
-                "Player already exists, ensuring role is assigned"
+                player, "Player already exists, ensuring role is assigned"
             )
-        
-        # Always raise the original error for upstream handling
-        raise
 
 
 async def deactivate_player(player: discord.Member, reason: str):
     """Deactivate a player from the system."""
     logger.info(
-        "Deactivating player: %s (ID: %s) - Reason: %s", 
-        player.name, player.id, reason
+        "Deactivating player: %s (ID: %s) - Reason: %s", player.name, player.id, reason
     )
 
     try:
         # Remove role first
         await _remove_player_role(player, "Player deactivated via bot command")
-        
+
         # Then deactivate in API
         await _deactivate_player_api(player.name)
         logger.info("Player %s deactivated successfully", player.name)
 
     except Exception as e:
         logger.error("Failed to deactivate player %s: %s", player.name, str(e))
-        raise
 
 
 async def active_player(player: discord.Member):
@@ -165,13 +159,9 @@ async def active_player(player: discord.Member):
         # Activate in API first
         await _activate_player_api(player.name)
         logger.info("Player %s activated successfully in API", player.name)
-        
+
         # Then ensure they have the role
-        await _ensure_player_has_role(
-            player,
-            "Player activated via bot command"
-        )
+        await _ensure_player_has_role(player, "Player activated via bot command")
 
     except Exception as e:
         logger.error("Failed to activate player %s: %s", player.name, str(e))
-        raise
