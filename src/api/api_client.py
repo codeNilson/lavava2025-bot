@@ -17,36 +17,42 @@ async def fetch_api(
     method: Literal["GET", "POST", "PATCH", "DELETE"] = "GET",
     data: Optional[Dict[str, Any]] = None,
 ):
-
     url = BASE_URL + endpoint
     url = url.replace("//", "/").replace(":/", "://")
     auth = aiohttp.BasicAuth(LOGIN, PASSWORD)
+
+    logger.debug("Making %s request to %s", method, endpoint)
+    if data:
+        logger.debug("Request payload: %s", data)
 
     try:
         async with aiohttp.ClientSession() as session:
             async with session.request(
                 method=method, url=url, json=data, auth=auth
             ) as response:
+                logger.info("API request successful: %s %s - Status: %d", method, endpoint, response.status)
                 response.raise_for_status()
                 return await response.json()
+                
     except aiohttp.ClientResponseError as e:
+        logger.error("API request failed: %s %s - Status: %d", method, endpoint, e.status)
+        
         if e.status == 401:
-            logger.error(
-                "Invalid credentials for API access. Status code: %s. Endpoint: %s",
-                e.status,
-                url,
-            )
-        if e.status == 404:
-            logger.error(
-                "Error while trying to reach API. Status code: %s. Endpoint: %s",
-                e.status,
-                url,
-            )
+            logger.error("Invalid credentials for API access")
+            raise RuntimeError("Credenciais inválidas para acesso à API") from e
+        elif e.status == 404:
+            logger.error("Resource not found: %s", endpoint)
             raise RuntimeError("Recurso não encontrado") from e
-        if e.status == 409:
+        elif e.status == 409:
+            logger.warning("Resource conflict: %s", endpoint)
             raise ResourceAlreadyExistsError("Conflito") from e
-
-        raise RuntimeError(f"Erro HTTP {e.status}") from e
+        else:
+            logger.error("HTTP error %d: %s", e.status, e.message if hasattr(e, 'message') else 'Unknown error')
+            raise RuntimeError(f"Erro HTTP {e.status}") from e
+            
     except aiohttp.ClientError as e:
-        logger.error("Connection error: %s", e)
+        logger.error("Connection error when accessing %s: %s", endpoint, str(e))
         raise RuntimeError(f"Erro de conexão: {e}") from e
+    except Exception as e:
+        logger.error("Unexpected error during API request to %s: %s", endpoint, str(e))
+        raise
