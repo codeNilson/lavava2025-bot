@@ -1,5 +1,6 @@
 import logging
 import discord
+from typing import Optional
 
 from src.error.api_errors import ResourceAlreadyExistsError
 from src.api import fetch_api
@@ -54,6 +55,7 @@ async def _register_player_api(player: discord.Member) -> None:
         data={
             "username": player.name,
             "discordId": player.id,
+            "displayIcon": (player.display_avatar.url),
         },
     )
 
@@ -87,6 +89,16 @@ async def get_all_players():
         return players_data
     except Exception as e:
         logger.error("Failed to fetch players: %s", str(e))
+
+
+async def get_player_by_username(username: str) -> Optional[dict]:
+    logger.info("Fetching player by username: %s", username)
+    player_data = await fetch_api(f"{PLAYERS_ENDPOINT}/username/{username}")
+    if not player_data:
+        logger.warning("No player found with username: %s", username)
+        return None
+    logger.info("Successfully retrieved player data for %s", username)
+    return player_data
 
 
 async def register_new_player(player: discord.Member):

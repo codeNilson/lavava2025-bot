@@ -1,5 +1,5 @@
 import logging
-from typing import Union
+from typing import Union, Optional
 
 import discord
 from discord import app_commands
@@ -10,8 +10,10 @@ from src.error.api_errors import ResourceNotFound
 from src.services.player_service import (
     active_player,
     deactivate_player,
+    get_player_by_username,
     register_new_player,
 )
+from src.models.player_model import Player
 
 logger = logging.getLogger(f"lavava.cog.{__name__}")
 
@@ -110,6 +112,49 @@ class PlayerCog(commands.Cog):
             f"✅ Jogador {member.name} reativado com sucesso!",
             ephemeral=True,
         )
+
+    @app_commands.command(
+        name="perfil",
+        description="Exibir perfil do jogador",
+    )
+    @app_commands.describe(member="Membro do servidor para exibir o perfil")
+    async def profile(
+        self,
+        interaction: discord.Interaction,
+        member: Optional[discord.Member | discord.User] = None,
+    ) -> None:
+        """Display player profile."""
+        if member is None:
+            member = interaction.user
+
+        if not isinstance(member, discord.Member):
+            await interaction.response.send_message(
+                "❌ Membro não encontrado ou não é um membro do servidor.",
+                ephemeral=True,
+            )
+            return
+
+        player_data = await get_player_by_username(member.name)
+
+        if not player_data:
+            await interaction.response.send_message(
+                "❌ Jogador não encontrado no sistema.",
+                ephemeral=True,
+            )
+            return
+
+        player = Player(**player_data)
+
+        embed = discord.Embed(
+            title=f"Perfil de {player.username}", color=discord.Color.blue()
+        )
+        embed.add_field(name="ID", value=player.id, inline=False)
+        embed.add_field(
+            name="Discord ID", value=player.discord_id or "N/A", inline=False
+        )
+        embed.set_thumbnail(url=player.display_icon or member.display_avatar.url)
+
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: commands.Bot):
