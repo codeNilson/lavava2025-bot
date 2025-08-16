@@ -1,5 +1,6 @@
 import logging
 from typing import Union, Optional
+from datetime import datetime
 
 import discord
 from discord import app_commands
@@ -10,7 +11,7 @@ from src.error.api_errors import ResourceNotFound
 from src.services.player_service import (
     active_player,
     deactivate_player,
-    get_player_by_username,
+    get_player_profile,
     register_new_player,
 )
 from src.models.player_model import Player
@@ -134,25 +135,36 @@ class PlayerCog(commands.Cog):
             )
             return
 
-        player_data = await get_player_by_username(member.name)
+        player_data = await get_player_profile(member.name)
+        assert player_data is not None
 
-        if not player_data:
-            await interaction.response.send_message(
-                "❌ Jogador não encontrado no sistema.",
-                ephemeral=True,
-            )
-            return
+        # Assumimos que player_data tem todos os campos necessários
+        dt = datetime.fromisoformat(player_data['lastUpdated'])
+        formatted_date = dt.strftime('%d/%m/%Y %H:%M')
 
-        player = Player(**player_data)
+        winrate = float(player_data['winRate'])
+        if winrate <= 1:
+            winrate *= 100
 
+        # Título com o username — mantemos a identificação única aqui
         embed = discord.Embed(
-            title=f"Perfil de {player.mention}", color=discord.Color.random()
+            title=f"{player_data['playerUsername']} — Perfil",
+            color=discord.Color.blurple(),
         )
-        embed.add_field(name="ID", value=player.id, inline=False)
-        embed.add_field(
-            name="Discord ID", value=player.discord_id or "N/A", inline=False
-        )
-        embed.set_thumbnail(url=player.display_icon or member.display_avatar.url)
+
+        # Miniatura do avatar
+        embed.set_thumbnail(url=member.display_avatar.url)
+
+        # Discord mention exibido uma única vez em campo próprio (sem repetir no título/author)
+        embed.add_field(name="Discord", value=member.mention, inline=True)
+
+        # Estatísticas principais
+        embed.add_field(name="🏅 Posição", value=f"#{player_data['position']}", inline=True)
+        embed.add_field(name="⭐ Pontos", value=str(player_data['totalPoints']), inline=True)
+        embed.add_field(name="📈 Winrate", value=f"{winrate:.2f}%", inline=True)
+        embed.add_field(name="🎮 Partidas", value=str(player_data['matchesPlayed']), inline=True)
+
+        embed.set_footer(text=f"Atualizado em: {formatted_date}")
 
         await interaction.response.send_message(embed=embed)
 

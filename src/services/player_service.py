@@ -91,14 +91,14 @@ async def get_all_players():
         logger.error("Failed to fetch players: %s", str(e))
 
 
-async def get_player_by_username(username: str) -> Optional[dict]:
-    logger.info("Fetching player by username: %s", username)
-    player_data = await fetch_api(f"{PLAYERS_ENDPOINT}/username/{username}")
-    if not player_data:
-        logger.warning("No player found with username: %s", username)
-        return None
-    logger.info("Successfully retrieved player data for %s", username)
-    return player_data
+# async def get_player_by_username(username: str) -> Optional[dict]:
+#     logger.info("Fetching player by username: %s", username)
+#     player_data = await fetch_api(f"{PLAYERS_ENDPOINT}/username/{username}")
+#     if not player_data:
+#         logger.warning("No player found with username: %s", username)
+#         return None
+#     logger.info("Successfully retrieved player data for %s", username)
+#     return player_data
 
 
 async def register_new_player(player: discord.Member):
@@ -177,3 +177,14 @@ async def active_player(player: discord.Member):
 
     except Exception as e:
         logger.error("Failed to activate player %s: %s", player.name, str(e))
+
+
+async def get_player_profile(username: str) -> Optional[dict]:
+    """Fetch player profile by username."""
+    logger.info("Fetching profile for player: %s", username)
+    player_data = await fetch_api(f"rankings/username/{username}")
+    if not player_data:
+        logger.warning("No profile found for player: %s", username)
+        return None
+    logger.info("Successfully retrieved profile for player: %s", username)
+    return player_data
