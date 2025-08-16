@@ -146,7 +146,7 @@ class PlayerCog(commands.Cog):
         player = Player(**player_data)
 
         embed = discord.Embed(
-            title=f"Perfil de {player.username}", color=discord.Color.blue()
+            title=f"Perfil de {player.mention}", color=discord.Color.random()
         )
         embed.add_field(name="ID", value=player.id, inline=False)
         embed.add_field(
