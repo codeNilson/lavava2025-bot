@@ -16,6 +16,7 @@ async def fetch_api(
     *,
     method: Literal["GET", "POST", "PATCH", "DELETE"] = "GET",
     data: Optional[Dict[str, Any]] = None,
+    params: Optional[Dict[str, Any]] = None,  # ← Novo parâmetro
 ):
     url = BASE_URL + endpoint
     url = url.replace("//", "/").replace(":/", "://")
@@ -24,11 +25,17 @@ async def fetch_api(
     logger.debug("Making %s request to %s", method, endpoint)
     if data:
         logger.debug("Request payload: %s", data)
+    if params:
+        logger.debug("Query parameters: %s", params)
 
     try:
         async with aiohttp.ClientSession() as session:
             async with session.request(
-                method=method, url=url, json=data, auth=auth
+                method=method,
+                url=url,
+                json=data,
+                params=params,  # ← Adiciona query params
+                auth=auth,
             ) as response:
                 logger.info(
                     "API request successful: %s %s - Status: %d",

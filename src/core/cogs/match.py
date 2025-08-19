@@ -4,21 +4,24 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from src.services.ranking_service import LeaderboardResponse
 from src.models.match_response_model import MatchResponse
-from src.services.team_service import create_team
-from src.services.match_service import create_match
-from src.core.ui.views.select_maps_view import SelectMapView
 from src.models.match_model import Match
 from src.models.player_model import Player
+from src.services.ranking_service import get_leaderboard
+from src.services.team_service import create_team
+from src.services.match_service import create_match
+from src.services.player_service import get_all_players
+from src.core.ui.views.select_maps_view import SelectMapView
 from src.core.ui.embeds import (
     build_captains_selected_embed,
     build_team_selection_embed,
     build_player_confirmation_embed,
     build_match_result_embed,
+    build_ranking_embed,
 )
 from src.core.ui.views import ConfirmParticipationView
 from src.core.ui.views.players_buttons_view import PlayersButtonsView
-from src.services.player_service import get_all_players
 
 logger = logging.getLogger("lavava.cog.match")
 
@@ -241,6 +244,34 @@ class MatchCog(commands.Cog):
             len(self.current_match.attacking_team) < 5
             or len(self.current_match.defending_team) < 5
         )
+
+    @app_commands.command(
+        name="ranking",
+        description="Mostra o ranking dos jogadores.",
+    )
+    async def update_ranking(self, interaction: discord.Interaction) -> None:
+        # Defer response since API call might take time
+        await interaction.response.defer()
+
+        try:
+            leaderboard: LeaderboardResponse = await get_leaderboard()
+            
+            if not leaderboard or not leaderboard.content:
+                await interaction.followup.send(
+                    "Não foi possível obter o ranking no momento ou não há jogadores ranqueados.",
+                    ephemeral=True,
+                )
+                return
+
+            embed = build_ranking_embed(leaderboard)
+            await interaction.followup.send(embed=embed)
+
+        except RuntimeError as e:
+            logger.error("Failed to fetch leaderboard: %s", str(e))
+            await interaction.followup.send(
+                "Erro ao buscar o ranking. Tente novamente mais tarde.",
+                ephemeral=True,
+            )
 
 
 async def setup(bot: commands.Bot):
