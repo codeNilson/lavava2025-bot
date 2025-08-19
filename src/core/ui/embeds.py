@@ -205,11 +205,11 @@ def build_ranking_embed(leaderboard_response: LeaderboardResponse) -> discord.Em
     podium = ""
     for i, entry in enumerate(leaderboard.content[:3]):
         if i == 0:
-            podium += f"🥇 **{entry.playerUsername}** • `{entry.totalPoints}pts` • {int(entry.winRate * 100)}% WR\n"
+            podium += f"🥇 **{entry.playerUsername}** • `{entry.totalPoints}pts` • _{int(entry.winRate * 100)}% WR_\n"
         elif i == 1:
-            podium += f"🥈 **{entry.playerUsername}** • `{entry.totalPoints}pts` • {int(entry.winRate * 100)}% WR\n"
+            podium += f"🥈 **{entry.playerUsername}** • `{entry.totalPoints}pts` • _{int(entry.winRate * 100)}% WR_\n"
         elif i == 2:
-            podium += f"🥉 **{entry.playerUsername}** • `{entry.totalPoints}pts` • {int(entry.winRate * 100)}% WR\n"
+            podium += f"🥉 **{entry.playerUsername}** • `{entry.totalPoints}pts` • _{int(entry.winRate * 100)}% WR_\n"
 
     if podium:
         embed.add_field(name="👑 **TOP 3**", value=podium, inline=False)
@@ -220,7 +220,7 @@ def build_ranking_embed(leaderboard_response: LeaderboardResponse) -> discord.Em
         others_text = ""
 
         for entry in remaining_players:
-            others_text += f"`{entry.position:2d}.` **{entry.playerUsername}** • `{entry.totalPoints}pts` • {int(entry.winRate * 100)}% WR\n"
+            others_text += f"`{entry.position:2d}.` **{entry.playerUsername}** • `{entry.totalPoints}pts` • _{int(entry.winRate * 100)}% WR_\n"
 
         if others_text:
             embed.add_field(name="📈 **Demais Posições**", value=others_text, inline=False)
