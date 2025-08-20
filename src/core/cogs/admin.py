@@ -6,7 +6,7 @@ from discord import app_commands
 
 from src.services.player_service import register_new_player
 
-logger = logging.getLogger(f"lavava.cog.{__name__}")
+logger: logging.Logger = logging.getLogger(f"lavava.cog.{__name__}")
 
 
 class AdminCog(commands.Cog):
@@ -41,6 +41,49 @@ class AdminCog(commands.Cog):
 
         await interaction.response.send_message(
             f"✅ Jogador {member.name} registrado.", ephemeral=True
+        )
+
+    group_clean = app_commands.Group(
+        name="limpar",
+        description="Comandos para limpar mensagens ou membros.",
+        default_permissions=discord.Permissions(administrator=True),
+    )
+
+    @group_clean.command(name="mensagens", description="Limpa mensagens de um canal.")
+    async def clean_messages(
+        self, interaction: discord.Interaction, channel: discord.TextChannel
+    ) -> None:
+        """Clear messages from the channel"""
+
+        await interaction.response.send_message(
+            f"Ok, limpando mensagens do canal {channel}.",
+            ephemeral=True,
+            delete_after=30,
+        )
+        await channel.purge(limit=None, bulk=True)
+        await interaction.followup.send("✅ Mensagens removidas com sucesso.")
+
+    @group_clean.command(name="cargos", description="Limpa os membros de um cargo.")
+    async def clean_roles(
+        self, interaction: discord.Interaction, role: discord.Role
+    ) -> None:
+        """Clear roles from members"""
+        if not role:
+            await interaction.response.send_message(
+                "⚠️ Nenhum cargo fornecido. Por favor, forneça um ou mais cargos."
+            )
+            return
+
+        await self.reset_role(role)
+        await interaction.response.send_message("Cargos removidos com sucesso.")
+
+    async def reset_role(self, role: discord.Role) -> None:
+
+        for member in role.members:
+            await member.remove_roles(role)
+
+        logger.info(
+            "Todos os membros com o cargo %s foram removidos com sucesso.", role.name
         )
 
 
