@@ -4,13 +4,20 @@ from typing import override
 import discord
 from discord import app_commands
 from discord.ext import commands
+from dotenv import load_dotenv
 
 from src.error import ResourceAlreadyExistsError
+from src.utils import get_variable
 
+load_dotenv()
 
 logger = logging.getLogger(f"lavava.{__name__}")
 
-GUILD_ID = discord.Object(1372683948554977350)
+GUILD_ID = discord.Object(get_variable("GUILD_ID"))
+
+if not GUILD_ID:
+    logger.error("GUILD_ID not found in environment variables.")
+    raise ValueError("GUILD_ID must be set in the environment variables.")
 
 
 class LavavaBot(commands.Bot):
