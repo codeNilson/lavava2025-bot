@@ -18,9 +18,6 @@ class PlayersButtonsView(discord.ui.View):
         self.message: discord.Message | None = None
 
     async def on_timeout(self):
-        # for child in self.children:
-        #     if isinstance(child, discord.ui.Button):
-        #         child.disabled = True
         if self.message:
 
             timeout_embed = discord.Embed(
@@ -104,8 +101,38 @@ class PlayersButtonsView(discord.ui.View):
             # Apply the pick to the correct team
             if is_first_turn_now:
                 self.cog.current_match.attacking_team.append(player)
+                role_name = "Time Atacante"
+                other_role_name = "Time Defensor"
             else:
                 self.cog.current_match.defending_team.append(player)
+                role_name = "Time Defensor"
+                other_role_name = "Time Atacante"
+
+            guild = interaction.guild
+            # Accept multiple possible attribute names for the discord id
+            discord_id = player.discord_id
+            if guild and discord_id:
+                try:
+                    member = guild.get_member(discord_id)
+                except Exception:
+                    member = None
+
+                if member:
+                    role: discord.Role | None = discord.utils.get(
+                        guild.roles, name=role_name
+                    )
+                    other_role: discord.Role | None = discord.utils.get(
+                        guild.roles, name=other_role_name
+                    )
+                    try:
+                        if other_role and other_role in member.roles:
+                            await member.remove_roles(other_role)
+                        if role and role not in member.roles:
+                            await member.add_roles(role)
+                    except discord.Forbidden:
+                        pass
+                    except discord.HTTPException:
+                        pass
 
             # Update the turn flag to reflect the next pick, keeping compatibility
             new_picks_made = picks_made + 1
