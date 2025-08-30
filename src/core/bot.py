@@ -13,12 +13,6 @@ load_dotenv()
 
 logger = logging.getLogger(f"lavava.{__name__}")
 
-GUILD_ID = discord.Object(get_variable("GUILD_ID"))
-
-if not GUILD_ID:
-    logger.error("GUILD_ID not found in environment variables.")
-    raise ValueError("GUILD_ID must be set in the environment variables.")
-
 
 class LavavaBot(commands.Bot):
     def __init__(
@@ -77,6 +71,6 @@ class LavavaBot(commands.Bot):
         await self.load_extension("src.core.cogs.player")
         await self.load_extension("src.core.cogs.match")
         await self.load_extension("src.core.cogs.ranking")
-        self.tree.copy_global_to(guild=GUILD_ID)
-        await self.tree.sync(guild=GUILD_ID)
-        # await self.tree.sync()
+        # self.tree.copy_global_to(guild=GUILD_ID)
+        # await self.tree.sync(guild=GUILD_ID)
+        await self.tree.sync()
