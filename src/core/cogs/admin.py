@@ -75,7 +75,9 @@ class AdminCog(commands.Cog):
             return
 
         await self.reset_role(role)
-        await interaction.response.send_message("Cargos removidos com sucesso.")
+        await interaction.response.send_message(
+            "Cargos removidos com sucesso.", ephemeral=True
+        )
 
     async def reset_role(self, role: discord.Role) -> None:
 
