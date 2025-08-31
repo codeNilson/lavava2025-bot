@@ -154,7 +154,7 @@ class MatchCog(commands.Cog):
 
         view = PlayersButtonsView(self)
 
-        for player in self.current_match.available_players:
+        for player in self.current_match.confirmed_players:  # TODO
             await view.add_player_button(player)
 
         await interaction.response.send_message(

@@ -142,14 +142,13 @@ async def build_match_result_embed(match: Match) -> discord.Embed:
         map_name = map_data.get("name", match.selected_map)
         map_image = map_data.get("splashUrl")
     except Exception:
-        # Fallback se não conseguir buscar dados do mapa
         map_name = match.selected_map
         map_image = None
 
     embed = discord.Embed(
         title=f"🏆 Partida Lavava 2025 - {map_name}",
         description="Partida formada! Boa sorte!",
-        color=discord.Color.green(),  # Verde para sucesso
+        color=discord.Color.green(),
     )
 
     # Validar times não vazios
@@ -171,9 +170,9 @@ async def build_match_result_embed(match: Match) -> discord.Embed:
         inline=True,
     )
 
-    # Apenas thumbnail (não duplicar imagem e thumbnail)
     if map_image:
         embed.set_thumbnail(url=map_image)
+        embed.set_image(url=map_image)
 
     embed.set_footer(text=f"🗺️ Mapa: {map_name} • Boa partida a todos!")
 

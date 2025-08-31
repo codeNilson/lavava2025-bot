@@ -10,17 +10,18 @@ from discord.ui import View, Select
 class MapSelect(Select):
     def __init__(self):
         self.maps = {
-            "Haven",
-            "Icebox",
-            "Pearl",
-            "Sunset",
-            "Lotus",
             "Abyss",
-            "Breeze",
             "Bind",
-            "Fracture",
+            "Sunset",
+            "Haven",
             "Split",
+            "Lotus",
+            "Pearl",
             "Ascent",
+            "Breeze",
+            "Icebox",
+            "Fracture",
+            "Corrode",
         }
 
         options = [discord.SelectOption(label=m, value=m) for m in sorted(self.maps)]
