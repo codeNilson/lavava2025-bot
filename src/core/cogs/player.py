@@ -11,7 +11,6 @@ from src.services.player_service import (
     active_player,
     deactivate_player,
 )
-from src.models.player_model import Player
 
 logger = logging.getLogger(f"lavava.cog.{__name__}")
 
