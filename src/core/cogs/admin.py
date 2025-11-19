@@ -24,25 +24,6 @@ class AdminCog(commands.Cog):
             delete_after=5,
         )
 
-    @app_commands.command(
-        name="registrar-jogador",
-        description="Registrar novo jogador",
-    )
-    @app_commands.default_permissions(administrator=True)
-    @app_commands.describe(member="O membro a ser registrado")
-    async def register(
-        self,
-        interaction: discord.Interaction,
-        member: discord.Member,
-    ) -> None:
-        """Register a new player."""
-
-        await register_new_player(member)
-
-        await interaction.response.send_message(
-            f"✅ Jogador {member.name} registrado.", ephemeral=True
-        )
-
     group_clean = app_commands.Group(
         name="limpar",
         description="Comandos para limpar mensagens ou membros.",
@@ -74,12 +55,12 @@ class AdminCog(commands.Cog):
             )
             return
 
-        await self.reset_role(role)
+        await self._reset_role(role)
         await interaction.response.send_message(
             "Cargos removidos com sucesso.", ephemeral=True
         )
 
-    async def reset_role(self, role: discord.Role) -> None:
+    async def _reset_role(self, role: discord.Role) -> None:
 
         for member in role.members:
             await member.remove_roles(role)
