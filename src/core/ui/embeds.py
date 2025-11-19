@@ -3,7 +3,6 @@ import math
 
 import discord
 
-from src.services.ranking_service import LeaderboardResponse
 from src.models.match_model import Match
 from src.services.map_service import get_map
 from src.models.player_model import Player
@@ -104,7 +103,11 @@ def build_team_selection_embed(
     )
 
     # Time Atacante - Tratar caso vazio
-    attacking_value = "\n".join(player.mention for player in first_team) if first_team else "⏳ *Aguardando seleção...*"
+    attacking_value = (
+        "\n".join(player.mention for player in first_team)
+        if first_team
+        else "⏳ *Aguardando seleção...*"
+    )
     embed.add_field(
         name="🗡️ Time Atacante",
         value=attacking_value,
@@ -115,7 +118,11 @@ def build_team_selection_embed(
     embed.add_field(name="\u200b", value="\u200b", inline=True)
 
     # Time Defensor - Tratar caso vazio
-    defending_value = "\n".join(player.mention for player in second_team) if second_team else "⏳ *Aguardando seleção...*"
+    defending_value = (
+        "\n".join(player.mention for player in second_team)
+        if second_team
+        else "⏳ *Aguardando seleção...*"
+    )
     embed.add_field(
         name="🛡️ Time Defensor",
         value=defending_value,
@@ -152,18 +159,26 @@ async def build_match_result_embed(match: Match) -> discord.Embed:
     )
 
     # Validar times não vazios
-    attacking_value = "\n".join(player.mention for player in match.attacking_team) if match.attacking_team else "*Nenhum jogador*"
-    defending_value = "\n".join(player.mention for player in match.defending_team) if match.defending_team else "*Nenhum jogador*"
+    attacking_value = (
+        "\n".join(player.mention for player in match.attacking_team)
+        if match.attacking_team
+        else "*Nenhum jogador*"
+    )
+    defending_value = (
+        "\n".join(player.mention for player in match.defending_team)
+        if match.defending_team
+        else "*Nenhum jogador*"
+    )
 
     embed.add_field(
         name="🗡️ Time Atacante",
         value=attacking_value,
         inline=True,
     )
-    
+
     # Campo vazio para espaçamento
     embed.add_field(name="\u200b", value="\u200b", inline=True)
-    
+
     embed.add_field(
         name="🛡️ Time Defensor",
         value=defending_value,
@@ -175,75 +190,5 @@ async def build_match_result_embed(match: Match) -> discord.Embed:
         embed.set_image(url=map_image)
 
     embed.set_footer(text=f"🗺️ Mapa: {map_name} • Boa partida a todos!")
-
-    return embed
-
-
-def build_ranking_embed(leaderboard_response: LeaderboardResponse) -> discord.Embed:
-    """Constrói um embed simplificado para o ranking."""
-
-    leaderboard = leaderboard_response
-
-    season = "2025"  # Padrão
-    if leaderboard.content:
-        season = leaderboard.content[0].season
-
-    embed = discord.Embed(
-        title=f"🏆 Ranking Lavava - Temporada {season}",
-        description="📊 **Classificação dos melhores jogadores**",
-        color=0xFFD700,  # Cor dourada
-    )
-
-    # Caso o ranking esteja vazio
-    if not leaderboard.content:
-        embed.description = "🔍 Nenhum jogador encontrado no ranking."
-        embed.color = discord.Color.orange()
-        return embed
-
-    # --- Pódio (TOP 3) ---
-    podium = ""
-    for i, entry in enumerate(leaderboard.content[:3]):
-        if i == 0:
-            podium += f"🥇 **{entry.playerUsername}** • `{entry.totalPoints}pts` • _{int(entry.winRate * 100)}% WR_\n"
-        elif i == 1:
-            podium += f"🥈 **{entry.playerUsername}** • `{entry.totalPoints}pts` • _{int(entry.winRate * 100)}% WR_\n"
-        elif i == 2:
-            podium += f"🥉 **{entry.playerUsername}** • `{entry.totalPoints}pts` • _{int(entry.winRate * 100)}% WR_\n"
-
-    if podium:
-        embed.add_field(name="👑 **TOP 3**", value=podium, inline=False)
-
-    # --- Demais Posições ---
-    if len(leaderboard.content) > 3:
-        remaining_players = leaderboard.content[3:]
-        others_text = ""
-
-        for entry in remaining_players:
-            others_text += f"`{entry.position:2d}.` **{entry.playerUsername}** • `{entry.totalPoints}pts` • _{int(entry.winRate * 100)}% WR_\n"
-
-        if others_text:
-            embed.add_field(name="📈 **Demais Posições**", value=others_text, inline=False)
-
-    # --- Rodapé e Estatísticas ---
-    total_players = leaderboard.totalElements
-    players_with_matches = len([p for p in leaderboard.content if p.matchesPlayed > 0])
-    
-    embed.add_field(
-        name="📊 **Estatísticas Gerais**",
-        value=f"👥 **{total_players}** jogadores no total\n⚡ **{players_with_matches}** com partidas jogadas",
-        inline=True,
-    )
-
-    if leaderboard.totalPages > 1:
-        embed.add_field(
-            name="📄 **Paginação**",
-            value=f"Página **{leaderboard.number + 1}** de **{leaderboard.totalPages}**",
-            inline=True,
-        )
-
-    embed.set_footer(
-        text=f"🔄 Atualizado • Mostrando {len(leaderboard.content)} de {total_players} jogadores"
-    )
-    embed.timestamp = discord.utils.utcnow()
 
     return embed

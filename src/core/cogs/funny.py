@@ -15,15 +15,17 @@ class FunnyCog(commands.Cog):
             "natan": "🐂",
             "nathan": "🐂",
             "eric": "💩",
-            "leo": "🏆",
-            "leozin": "🏆",
+            "leo": "🥇",
+            "leozin": "🥇",
             "catherine": "👩🏻‍🦯",
             "cath": "👩🏻‍🦯",
             "cat": "👩🏻‍🦯",
             "pain": "🥈",
             "douglas": "🥈",
-            "bruno": "🇧🇷",
-            "kickes": "🇧🇷",
+            "shaqueda": "🥉",
+            "klaus": "🥈",
+            "klauz": "🥈",
+            "klauzemberg": "🥈",
         }
 
     @commands.Cog.listener()

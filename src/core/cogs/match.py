@@ -8,8 +8,6 @@ from discord.ext import commands
 from src.models.match_response_model import MatchResponse
 from src.models.match_model import Match
 from src.models.player_model import Player
-from src.services.team_service import create_team
-from src.services.match_service import create_match
 from src.services.player_service import get_all_players
 from src.core.ui.views.select_maps_view import SelectMapView
 from src.core.ui.embeds import (
@@ -217,21 +215,6 @@ class MatchCog(commands.Cog):
 
         await interaction.response.defer(thinking=True)
 
-        match_info: MatchResponse = await create_match(self.current_match)
-
-        await create_team(
-            match_info.id,
-            self.current_match.attacking_team,
-        )
-
-        logger.info("Attacking team created for match %s", match_info.id)
-
-        await create_team(
-            match_info.id,
-            self.current_match.defending_team,
-        )
-
-        logger.info("Defending team created for match %s", match_info.id)
 
         await interaction.followup.send(
             "Partida iniciada com sucesso! Boa sorte a todos os jogadores!",
