@@ -1,6 +1,5 @@
 import logging
-from typing import Union, Optional
-from datetime import datetime
+from typing import Union
 
 import discord
 from discord import app_commands
@@ -11,8 +10,6 @@ from src.error.api_errors import ResourceNotFound
 from src.services.player_service import (
     active_player,
     deactivate_player,
-    get_player_profile,
-    register_new_player,
 )
 from src.models.player_model import Player
 
@@ -29,7 +26,6 @@ class PlayerCog(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         """Handle new member registration."""
         logger.info("New member joined: %s (ID: %s)", member.name, member.id)
-        await register_new_player(member)
 
     @commands.Cog.listener()
     async def on_member_ban(
@@ -56,23 +52,6 @@ class PlayerCog(commands.Cog):
             member.name,
             member.id,
             ban_reason,
-        )
-
-    @app_commands.command(
-        name="registrar",
-        description="Registrar novo jogador",
-    )
-    async def register(self, interaction: discord.Interaction) -> None:
-        """Register a new player."""
-
-        member: Union[discord.User, discord.Member] = interaction.user
-        assert isinstance(member, discord.Member)
-
-        await register_new_player(member)
-
-        await interaction.response.send_message(
-            f"✅ Registro concluído com sucesso! Seja bem-vindo, {member.name}!",
-            ephemeral=True,
         )
 
     @app_commands.command(
@@ -113,60 +92,6 @@ class PlayerCog(commands.Cog):
             f"✅ Jogador {member.name} reativado com sucesso!",
             ephemeral=True,
         )
-
-    # @app_commands.command(
-    #     name="perfil",
-    #     description="Exibir perfil do jogador",
-    # )
-    # @app_commands.describe(member="Membro do servidor para exibir o perfil")
-    # async def profile(
-    #     self,
-    #     interaction: discord.Interaction,
-    #     member: Optional[discord.Member | discord.User] = None,
-    # ) -> None:
-    #     """Display player profile."""
-    #     if member is None:
-    #         member = interaction.user
-
-    #     if not isinstance(member, discord.Member):
-    #         await interaction.response.send_message(
-    #             "❌ Membro não encontrado ou não é um membro do servidor.",
-    #             ephemeral=True,
-    #         )
-    #         return
-
-    #     player_data = await get_player_profile(member.name)
-    #     assert player_data is not None
-
-    #     # Assumimos que player_data tem todos os campos necessários
-    #     dt = datetime.fromisoformat(player_data['lastUpdated'])
-    #     formatted_date = dt.strftime('%d/%m/%Y %H:%M')
-
-    #     winrate = float(player_data['winRate'])
-    #     if winrate <= 1:
-    #         winrate *= 100
-
-    #     # Título com o username — mantemos a identificação única aqui
-    #     embed = discord.Embed(
-    #         title=f"{player_data['playerUsername']} — Perfil",
-    #         color=discord.Color.blurple(),
-    #     )
-
-    #     # Miniatura do avatar
-    #     embed.set_thumbnail(url=member.display_avatar.url)
-
-    #     # Discord mention exibido uma única vez em campo próprio (sem repetir no título/author)
-    #     embed.add_field(name="Discord", value=member.mention, inline=True)
-
-    #     # Estatísticas principais
-    #     embed.add_field(name="🏅 Posição", value=f"#{player_data['position']}", inline=True)
-    #     embed.add_field(name="⭐ Pontos", value=str(player_data['totalPoints']), inline=True)
-    #     embed.add_field(name="📈 Winrate", value=f"{winrate:.2f}%", inline=True)
-    #     embed.add_field(name="🎮 Partidas", value=str(player_data['matchesPlayed']), inline=True)
-
-    #     embed.set_footer(text=f"Atualizado em: {formatted_date}")
-
-    #     await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: commands.Bot):

@@ -4,8 +4,6 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from src.services.player_service import register_new_player
-
 logger: logging.Logger = logging.getLogger(f"lavava.cog.{__name__}")
 
 

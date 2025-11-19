@@ -5,7 +5,6 @@ from discord import app_commands
 from discord.ext import commands
 
 
-from src.models.match_response_model import MatchResponse
 from src.models.match_model import Match
 from src.models.player_model import Player
 from src.services.player_service import get_all_players

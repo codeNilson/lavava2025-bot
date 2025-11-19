@@ -3,7 +3,6 @@ import logging
 
 import discord
 
-from src.error.api_errors import ResourceAlreadyExistsError
 from src.api import fetch_api
 
 PLAYERS_ENDPOINT = "players"
@@ -91,49 +90,6 @@ async def get_all_players():
     except Exception as e:
         logger.error("Failed to fetch players: %s", str(e))
 
-async def register_new_player(player: discord.Member):
-    """Register a new player in the system."""
-    logger.info("Registering new player: %s (ID: %s)", player.name, player.id)
-
-    try:
-        # Try to register player in API
-        await _register_player_api(player)
-        logger.info("Player %s registered successfully in API", player.name)
-
-        # Ensure player has the role
-        await _ensure_player_has_role(player, "Player registered via bot command")
-
-    except ResourceAlreadyExistsError:
-        logger.warning(
-            "Player %s (ID: %s) already exists in the system.",
-            player.name,
-            player.id,
-        )
-
-        # Player already exists - try to reactivate in case they're deactivated
-        try:
-            await _activate_player_api(player.name)
-            logger.info(
-                "Player %s was deactivated and has been reactivated", player.name
-            )
-
-            # Ensure player has the role after reactivation
-            await _ensure_player_has_role(
-                player, "Player reactivated via registration attempt"
-            )
-
-        except (ResourceAlreadyExistsError, RuntimeError) as reactivate_error:
-            logger.debug(
-                "Could not reactivate player %s (they might be already active): %s",
-                player.name,
-                str(reactivate_error),
-            )
-
-            # Even if reactivation fails, ensure they have the role
-            await _ensure_player_has_role(
-                player, "Player already exists, ensuring role is assigned"
-            )
-
 
 async def deactivate_player(player: discord.Member, reason: str):
     """Deactivate a player from the system."""
@@ -169,10 +125,11 @@ async def active_player(player: discord.Member):
         logger.error("Failed to activate player %s: %s", player.name, str(e))
 
 
+# TODO: Implementar list selection dos jogadores para buscar o perfil correto
 async def get_player_profile(username: str) -> Optional[dict]:
     """Fetch player profile by username."""
     logger.info("Fetching profile for player: %s", username)
-    player_data = await fetch_api(f"rankings/username/{username}")
+    player_data = await fetch_api(f"players/{username}")
     if not player_data:
         logger.warning("No profile found for player: %s", username)
         return None
