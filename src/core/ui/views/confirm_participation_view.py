@@ -36,10 +36,10 @@ class ConfirmParticipationView(discord.ui.View):
     def _find_player_in_confirmed(self, user_id: int) -> Optional[discord.Member]:
         """Find a player in the confirmed players list by user ID."""
         return find(lambda p: p.id == user_id, self.confirmed_players)
-
-    def _user_has_confirmed(self, user_id: int) -> bool:
-        """Check if a user has already confirmed participation."""
-        return any(p.id == user_id for p in self.cog.current_match.confirmed_players)
+    
+    def _find_player_in_denied(self, user_id: int) -> Optional[discord.Member]:
+        """Find a player in the denied players list by user ID."""
+        return find(lambda p: p.id == user_id, self.denied_players)
 
     @discord.ui.button(
         label="Bora jogar!",
