@@ -18,9 +18,6 @@ class ConfirmParticipationView(discord.ui.View):
     def __init__(self, cog: "MatchCog") -> None:
         super().__init__(timeout=30)
         self.cog: "MatchCog" = cog
-        # self.confirmed_players: list[Player] = (
-        #     self.cog.current_match.confirmed_players or []
-        # )
         self.message: Optional[discord.Message] = None
 
     @property
