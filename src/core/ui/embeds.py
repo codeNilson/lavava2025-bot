@@ -5,12 +5,11 @@ import discord
 
 from src.models.match_model import Match
 from src.services.map_service import get_map
-from src.models.player_model import Player
 
 
 def build_player_confirmation_embed(
-    confirmed_players: Optional[list[discord.Member]],
-    denied_players: Optional[list[discord.Member]],
+    confirmed_players: Optional[list[discord.Member]] = None,
+    denied_players: Optional[list[discord.Member]] = None,
 ) -> discord.Embed:
     """Create an embed listing all players with their confirmation status."""
     embed = discord.Embed(title="🏆 Partida Lavava 2025", color=discord.Color.red())
@@ -54,8 +53,8 @@ def build_player_confirmation_embed(
 
 
 def build_captains_selected_embed(
-    first_captain: Player,
-    second_captain: Player,
+    first_captain: discord.Member,
+    second_captain: discord.Member,
 ) -> discord.Embed:
     """Create an embed showing the chosen captains."""
     embed = discord.Embed(
@@ -88,8 +87,8 @@ def build_captains_selected_embed(
 
 
 def build_team_selection_embed(
-    first_team: list[Player],
-    second_team: list[Player],
+    first_team: list[discord.Member],
+    second_team: list[discord.Member],
 ) -> discord.Embed:
     """Create an embed showing the players to choose."""
     embed = discord.Embed(

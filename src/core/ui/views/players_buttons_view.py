@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import discord
 
 from src.core.ui.embeds import build_team_selection_embed
-from src.models.player_model import Player
+# from src.models.player_model import Player
 
 if TYPE_CHECKING:
     from src.core.cogs.match import MatchCog
@@ -28,7 +28,7 @@ class PlayersButtonsView(discord.ui.View):
 
             await self.message.edit(embed=timeout_embed, view=None)
 
-    async def add_player_button(self, player: Player):
+    async def add_player_button(self, player: discord.Member):
         """Add a button for a player."""
 
         # Skip adding button for captains
@@ -39,9 +39,9 @@ class PlayersButtonsView(discord.ui.View):
             return
 
         button = discord.ui.Button(
-            label=player.username,
+            label=player.display_name,
             style=discord.ButtonStyle.primary,
-            custom_id=player.username,
+            custom_id=player.display_name,
         )
 
         async def button_callback(interaction: discord.Interaction):
@@ -110,7 +110,7 @@ class PlayersButtonsView(discord.ui.View):
 
             guild = interaction.guild
             # Accept multiple possible attribute names for the discord id
-            discord_id = player.discord_id
+            discord_id = player.id
             if guild and discord_id:
                 try:
                     member = guild.get_member(discord_id)
@@ -144,7 +144,7 @@ class PlayersButtonsView(discord.ui.View):
             for button in self.children:
                 if not isinstance(button, discord.ui.Button):
                     continue
-                if button.custom_id == player.username:
+                if button.custom_id == player.display_name:
                     button.disabled = True
                     button.style = discord.ButtonStyle.secondary
 

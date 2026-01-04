@@ -6,8 +6,6 @@ from discord.ext import commands
 
 
 from src.models.match_model import Match
-from src.models.player_model import Player
-from src.services.player_service import get_all_players
 from src.core.ui.views.select_maps_view import SelectMapView
 from src.core.ui.embeds import (
     build_captains_selected_embed,
@@ -60,7 +58,7 @@ class MatchCog(commands.Cog):
 
         # Respond the interaction with the confirmation embed and the view
         await interaction.response.send_message(
-            embed=build_player_confirmation_embed(self.current_match.available_players),
+            embed=build_player_confirmation_embed(),
             view=confirmation_view,
         )
 
