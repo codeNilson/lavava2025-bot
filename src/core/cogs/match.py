@@ -51,14 +51,12 @@ class MatchCog(commands.Cog):
         self.current_match.reset_match()
 
         # Call function to load all players from the database
-        players_loaded: bool = await self._load_all_players(interaction)
-        if not players_loaded:
-            return
+        # players_loaded: bool = await self._load_all_players(interaction)
+        # if not players_loaded:
+        #     return
 
         # Create the view for confirmation
-        confirmation_view = ConfirmParticipationView(
-            self.current_match.available_players, cog=self
-        )
+        confirmation_view = ConfirmParticipationView(cog=self)
 
         # Respond the interaction with the confirmation embed and the view
         await interaction.response.send_message(
@@ -85,28 +83,6 @@ class MatchCog(commands.Cog):
         await interaction.followup.send(
             "Etapa de confirmação encerrada. Hora de sortear os capitães!"
         )
-
-    async def _load_all_players(self, interaction: discord.Interaction) -> bool:
-        """Load all players from the database."""
-
-        # fetch players from backend
-        players_data = await get_all_players()
-
-        # check if there are enough players to start a match
-        # if not, send a message to the user and return False
-        if not players_data or len(players_data) < 10:
-            await interaction.response.send_message(
-                "Não há jogadores suficientes para iniciar uma partida.",
-                ephemeral=True,
-                delete_after=10,
-            )
-            return False
-
-        # set the available players to the players loaded from the database
-        self.current_match.available_players = [
-            Player(**player) for player in players_data
-        ]
-        return True
 
     @match_making.command(
         name="capitães",
@@ -213,7 +189,6 @@ class MatchCog(commands.Cog):
             return
 
         await interaction.response.defer(thinking=True)
-
 
         await interaction.followup.send(
             "Partida iniciada com sucesso! Boa sorte a todos os jogadores!",
