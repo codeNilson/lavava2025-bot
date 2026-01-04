@@ -9,8 +9,8 @@ from src.models.player_model import Player
 
 
 def build_player_confirmation_embed(
-    confirmed_players: Optional[list[Player]] = None,
-    denied_players: Optional[list[Player]] = None,
+    confirmed_players: Optional[list[discord.Member]],
+    denied_players: Optional[list[discord.Member]],
 ) -> discord.Embed:
     """Create an embed listing all players with their confirmation status."""
     embed = discord.Embed(title="🏆 Partida Lavava 2025", color=discord.Color.red())

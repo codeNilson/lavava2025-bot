@@ -71,7 +71,6 @@ class ConfirmParticipationView(discord.ui.View):
         self.cog.current_match.confirmed_players.append(member)
 
         updated_embed: discord.Embed = build_player_confirmation_embed(
-            self.available_players,
             self.cog.current_match.confirmed_players,
             self.cog.current_match.denied_players,
         )
