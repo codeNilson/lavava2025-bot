@@ -36,7 +36,7 @@ class ConfirmParticipationView(discord.ui.View):
     def _find_player_in_confirmed(self, user_id: int) -> Optional[discord.Member]:
         """Find a player in the confirmed players list by user ID."""
         return find(lambda p: p.id == user_id, self.confirmed_players)
-    
+
     def _find_player_in_denied(self, user_id: int) -> Optional[discord.Member]:
         """Find a player in the denied players list by user ID."""
         return find(lambda p: p.id == user_id, self.denied_players)
@@ -54,7 +54,7 @@ class ConfirmParticipationView(discord.ui.View):
         member: discord.User | discord.Member = interaction.user
         assert isinstance(member, discord.Member)
 
-        # Encontra o jogador na lista disponível
+        # Previne confirmações duplicadas
         player_already_confirmed = self._find_player_in_confirmed(member.id)
         if player_already_confirmed:
             await interaction.response.send_message(
@@ -64,7 +64,7 @@ class ConfirmParticipationView(discord.ui.View):
             return
 
         # Remove o jogador da lista de negados, se presente
-        denied_players = self.cog.current_match.denied_players
+        denied_players = self.denied_players
         for p in denied_players:
             if p.id == member.id:
                 denied_players.remove(p)
@@ -91,29 +91,27 @@ class ConfirmParticipationView(discord.ui.View):
     ) -> None:
         """Handle the deny button click."""
 
-        user_id = interaction.user.id
+        member: discord.User | discord.Member = interaction.user
+        assert isinstance(member, discord.Member)
 
         # Encontra o jogador na lista disponível
-        user_player: Player | None = self._find_player_in_available(user_id)
-        if not user_player:
+        player_already_denied = self._find_player_in_denied(member.id)
+        if player_already_denied:
             await interaction.response.send_message(
-                "❌ Você não está na lista de jogadores disponíveis.",
+                "❌ Você já recusou sua participação!",
                 ephemeral=True,
             )
             return
 
-        # Remove das listas se já estava em alguma
-        self.cog.current_match.confirmed_players = [
-            p
-            for p in self.cog.current_match.confirmed_players
-            if p.discord_id != user_id
-        ]
-        self.cog.current_match.denied_players = [
-            p for p in self.cog.current_match.denied_players if p.discord_id != user_id
-        ]
+        # Remove o jogador da lista de confirmados, se presente
+        confirmed_players = self.confirmed_players
+        for p in confirmed_players:
+            if p.id == member.id:
+                confirmed_players.remove(p)
+                break
 
         # Adiciona à lista de negados
-        self.cog.current_match.denied_players.append(user_player)
+        self.cog.current_match.denied_players.append(member)
 
         updated_embed = build_player_confirmation_embed(
             self.available_players,
@@ -132,14 +130,6 @@ class ConfirmParticipationView(discord.ui.View):
     ) -> None:
         """Handle the start match button click."""
 
-        if len(self.cog.current_match.confirmed_players) < 2:
-            await interaction.response.send_message(
-                "É necessário pelo menos 2 jogadores confirmados para iniciar a partida.",
-                ephemeral=True,
-                delete_after=5,
-            )
-            return
-
         # Cast para Member
         member: discord.User | discord.Member = interaction.user
         assert isinstance(member, discord.Member)
@@ -147,6 +137,15 @@ class ConfirmParticipationView(discord.ui.View):
         if not member.guild_permissions.administrator:
             await interaction.response.send_message(
                 "❌ Somente um adm pode iniciar a partida.",
+                ephemeral=True,
+                delete_after=5,
+            )
+            return
+
+        # TODO: Alterar o requisito para 10 jogadores confirmados
+        if len(self.cog.current_match.confirmed_players) < 2:
+            await interaction.response.send_message(
+                "É necessário pelo menos 2 jogadores confirmados para iniciar a partida.",
                 ephemeral=True,
                 delete_after=5,
             )
