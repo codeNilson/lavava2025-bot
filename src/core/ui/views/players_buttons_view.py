@@ -78,11 +78,11 @@ class PlayersButtonsView(discord.ui.View):
             )
 
             # Block interaction from users who are not the current-turn captain
-            if interaction.user.id != current_turn_captain.discord_id:
+            if interaction.user.id != current_turn_captain.id:
                 # If user is a captain but it's not their turn
                 if interaction.user.id in (
-                    first_captain.discord_id,
-                    second_captain.discord_id,
+                    first_captain.id,
+                    second_captain.id,
                 ):
                     await interaction.response.send_message(
                         "Ainda não é sua vez de escolher.",

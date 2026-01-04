@@ -3,7 +3,6 @@ from typing import Optional, TYPE_CHECKING
 import discord
 from discord.utils import find
 from src.core.ui.embeds import build_player_confirmation_embed
-from src.models.player_model import Player
 
 if TYPE_CHECKING:
     from src.core.cogs.match import MatchCog
@@ -110,9 +109,8 @@ class ConfirmParticipationView(discord.ui.View):
         self.cog.current_match.denied_players.append(member)
 
         updated_embed = build_player_confirmation_embed(
-            self.available_players,
-            self.cog.current_match.confirmed_players,
-            self.cog.current_match.denied_players,
+            self.confirmed_players,
+            self.denied_players,
         )
 
         await interaction.response.edit_message(embed=updated_embed, view=self)

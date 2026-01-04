@@ -25,21 +25,21 @@ def build_player_confirmation_embed(
     denied_players = denied_players or []
 
     # IDs para comparação
-    confirmed_ids = {player.discord_id for player in confirmed_players}
-    denied_ids = {player.discord_id for player in denied_players}
+    confirmed_ids = {player.id for player in confirmed_players}
+    denied_ids = {player.id for player in denied_players}
 
     for i in range(math.ceil(len(confirmed_players) / 5)):
         column = ""
 
         for player in confirmed_players[i * 5 : (i + 1) * 5]:
-            if player.discord_id in confirmed_ids:
+            if player.id in confirmed_ids:
                 emoji = "✅"
-            elif player.discord_id in denied_ids:
+            elif player.id in denied_ids:
                 emoji = "❌"
             else:
                 emoji = "⏳"
 
-            column += f"{emoji} {player.username}\n"
+            column += f"{emoji} {player.display_name}\n"
 
         embed.add_field(name="", value=column, inline=True)
 
